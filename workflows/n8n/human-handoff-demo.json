@@ -1,0 +1,155 @@
+{
+  "name": "Opiagile - Handoff humano demo",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "id": "agenda",
+      "name": "Verificar a cada minuto",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.OPIAGILE_API_URL || \"http://host.docker.internal:8080\"}}/api/handoffs"
+      },
+      "id": "listar-handoffs",
+      "name": "Listar handoffs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "={{$json}}"
+      },
+      "id": "separar-registros",
+      "name": "Separar registros",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.status}}",
+              "operation": "equals",
+              "value2": "OPEN"
+            }
+          ]
+        }
+      },
+      "id": "somente-abertos",
+      "name": "Somente abertos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "titulo",
+              "value": "=Novo handoff: {{$json.reason}}",
+              "type": "string"
+            },
+            {
+              "name": "resumo",
+              "value": "={{$json.summary}}",
+              "type": "string"
+            },
+            {
+              "name": "handoffId",
+              "value": "={{$json.id}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "preparar-card",
+      "name": "Preparar card humano",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -120
+      ]
+    }
+  ],
+  "connections": {
+    "Verificar a cada minuto": {
+      "main": [
+        [
+          {
+            "node": "Listar handoffs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar handoffs": {
+      "main": [
+        [
+          {
+            "node": "Separar registros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar registros": {
+      "main": [
+        [
+          {
+            "node": "Somente abertos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Somente abertos": {
+      "main": [
+        [
+          {
+            "node": "Preparar card humano",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "demo-human-handoff"
+}

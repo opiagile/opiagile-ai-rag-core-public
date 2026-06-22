@@ -1,0 +1,83 @@
+app:
+  name: ${APP_NAME:opiagile-ai-rag-core}
+  version: ${APP_VERSION:0.1.0-SNAPSHOT}
+  environment: ${APP_ENV:local}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: ${app.name}
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:opiagile_ai_rag_core}
+    username: ${POSTGRES_USER:opiagile}
+    password: ${POSTGRES_PASSWORD:opiagile_dev_password}
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+openai:
+  embeddings:
+    enabled: ${OPENAI_EMBEDDINGS_ENABLED:false}
+  api-key: ${OPENAI_API_KEY:}
+  embedding-model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+  embedding-dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:1536}
+  chat-model: ${OPENAI_CHAT_MODEL:${OPENAI_MODEL:gpt-5-mini}}
+  max-output-tokens: ${OPENAI_MAX_OUTPUT_TOKENS:600}
+  timeout-seconds: ${OPENAI_TIMEOUT_SECONDS:30}
+  reasoning-effort: ${OPENAI_REASONING_EFFORT:minimal}
+  text-verbosity: ${OPENAI_TEXT_VERBOSITY:low}
+
+llm:
+  provider: ${LLM_PROVIDER:DEMO}
+
+chat:
+  response-mode: ${CHAT_RESPONSE_MODE:DEMO}
+  system-tone: ${CHAT_SYSTEM_TONE:profissional, claro, acolhedor e objetivo}
+
+documents:
+  chunk:
+    max-chars: ${DOCUMENT_CHUNK_MAX_CHARS:900}
+    overlap-chars: ${DOCUMENT_CHUNK_OVERLAP_CHARS:120}
+
+rag:
+  top-k: ${RAG_TOP_K:5}
+  min-score: ${RAG_MIN_SCORE:0.15}
+
+conversation:
+  history-limit: ${CONVERSATION_HISTORY_LIMIT:8}
+
+intent:
+  llm:
+    enabled: ${INTENT_LLM_ENABLED:false}
+
+whatsapp:
+  provider: ${WHATSAPP_PROVIDER:MOCK}
+  verify-token: ${WHATSAPP_VERIFY_TOKEN:}
+  app-secret: ${WHATSAPP_APP_SECRET:}
+  access-token: ${WHATSAPP_ACCESS_TOKEN:}
+  phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID:}
+  business-account-id: ${WHATSAPP_BUSINESS_ACCOUNT_ID:}
+  graph-api-version: ${WHATSAPP_GRAPH_API_VERSION:v23.0}
+  allowed-test-numbers: ${WHATSAPP_ALLOWED_TEST_NUMBERS:}
+  public-base-url: ${WHATSAPP_PUBLIC_BASE_URL:}
+  send-enabled: ${WHATSAPP_SEND_ENABLED:false}
+  dry-run: ${WHATSAPP_DRY_RUN:true}
+  signature-required: ${WHATSAPP_SIGNATURE_REQUIRED:true}
+  rate-limit-per-minute: ${WHATSAPP_RATE_LIMIT_PER_MINUTE:5}
+  block-unauthorized: ${WHATSAPP_BLOCK_UNAUTHORIZED:true}
+
+langfuse:
+  enabled: ${LANGFUSE_ENABLED:false}
+  host: ${LANGFUSE_HOST:}

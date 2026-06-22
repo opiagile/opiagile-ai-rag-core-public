@@ -1,0 +1,109 @@
+name: opiagile-rag-core
+
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/oracle-free-tier/Dockerfile.api
+    image: opiagile-ai-rag-core:develop
+    container_name: opiagile-rag-core-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_NAME: ${APP_NAME:-opiagile-ai-rag-core}
+      APP_ENV: ${APP_ENV:-oracle-free-tier}
+      SERVER_PORT: 8080
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      FLYWAY_ENABLED: ${FLYWAY_ENABLED:-true}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
+      RAG_MIN_SCORE: ${RAG_MIN_SCORE:-0.15}
+      DOCUMENT_CHUNK_MAX_CHARS: ${DOCUMENT_CHUNK_MAX_CHARS:-900}
+      DOCUMENT_CHUNK_OVERLAP_CHARS: ${DOCUMENT_CHUNK_OVERLAP_CHARS:-120}
+      CONVERSATION_HISTORY_LIMIT: ${CONVERSATION_HISTORY_LIMIT:-8}
+      LLM_PROVIDER: ${LLM_PROVIDER:-DEMO}
+      CHAT_RESPONSE_MODE: ${CHAT_RESPONSE_MODE:-DEMO}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-5-mini}
+      OPENAI_EMBEDDINGS_ENABLED: ${OPENAI_EMBEDDINGS_ENABLED:-false}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      OPENAI_EMBEDDING_DIMENSIONS: ${OPENAI_EMBEDDING_DIMENSIONS:-1536}
+      OPENAI_MAX_OUTPUT_TOKENS: ${OPENAI_MAX_OUTPUT_TOKENS:-600}
+      OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-30}
+      OPENAI_REASONING_EFFORT: ${OPENAI_REASONING_EFFORT:-minimal}
+      OPENAI_TEXT_VERBOSITY: ${OPENAI_TEXT_VERBOSITY:-low}
+      CHAT_SYSTEM_TONE: ${CHAT_SYSTEM_TONE:-profissional, claro, acolhedor e objetivo}
+      LANGFUSE_ENABLED: ${LANGFUSE_ENABLED:-false}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-}
+      WHATSAPP_PROVIDER: MOCK
+      WHATSAPP_SEND_ENABLED: "false"
+      WHATSAPP_DRY_RUN: "true"
+    networks:
+      - internal
+    mem_limit: 2g
+    cpus: "1.50"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  postgres:
+    image: pgvector/pgvector:pg16-trixie
+    container_name: opiagile-rag-core-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    networks:
+      - internal
+    mem_limit: 3g
+    cpus: "1.00"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: opiagile-rag-core-caddy
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      RAG_DOMAIN: ${RAG_DOMAIN:-}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ${CADDYFILE_PATH:-./Caddyfile.http}:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - internal
+    mem_limit: 256m
+    cpus: "0.25"
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

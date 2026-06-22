@@ -1,0 +1,43 @@
+name: Validar core RAG
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validar:
+    name: Testes e verificações
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Testar backend
+        run: cd backend && ./mvnw test
+
+      - name: Validar Docker Compose local
+        run: |
+          cp .env.example .env
+          docker compose --env-file .env config
+
+      - name: Verificar padrões de segredos versionados
+        run: |
+          ! git grep -nE 'sk-[A-Za-z0-9_-]+' -- . ':!.git'
+          ! git grep -nE 'EAAG[A-Za-z0-9]+' -- . ':!.git'
+          ! git grep -nE 'OPENAI_API_KEY=.*s[k]-' -- . ':!.git'
+          ! git grep -nE 'WHATSAPP_ACCESS_TOKEN=.*[A-Za-z0-9]' -- . ':!.git'
+          ! git grep -nE 'WHATSAPP_APP_SECRET=.*[A-Za-z0-9]' -- . ':!.git'

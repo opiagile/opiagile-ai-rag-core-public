@@ -1,0 +1,69 @@
+{
+  "info": {
+    "name": "Opiagile AI RAG Core",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Versão",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/version"
+      }
+    },
+    {
+      "name": "Listar documentos",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/documents"
+      }
+    },
+    {
+      "name": "Chat RAG",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/chat",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Vocês atendem aos sábados?\",\n  \"channel\": \"WEB\",\n  \"contactId\": \"postman-demo\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Webhook WhatsApp mock",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/webhooks/whatsapp",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"provider\": \"MOCK\",\n  \"from\": \"+5511999999999\",\n  \"name\": \"João\",\n  \"message\": \"Quero agendar uma consulta\",\n  \"timestamp\": \"2026-05-28T08:53:00-04:00\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Listar handoffs",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/handoffs"
+      }
+    }
+  ]
+}

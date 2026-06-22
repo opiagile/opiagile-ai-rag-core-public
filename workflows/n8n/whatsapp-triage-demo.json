@@ -1,0 +1,132 @@
+{
+  "name": "Opiagile - WhatsApp triagem demo",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "opiagile/whatsapp-triage",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-whatsapp",
+      "name": "Receber WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OPIAGILE_API_URL || \"http://host.docker.internal:8080\"}}/api/webhooks/whatsapp",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify($json.body)}}"
+      },
+      "id": "api-whatsapp",
+      "name": "Chamar API Opiagile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.handoffRequired}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "verificar-handoff",
+      "name": "Precisa de humano?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}"
+      },
+      "id": "responder-whatsapp",
+      "name": "Responder ao canal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify({status:\"NEEDS_HUMAN\", data:$json})}}"
+      },
+      "id": "responder-humano",
+      "name": "Responder com handoff",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "Receber WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Chamar API Opiagile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chamar API Opiagile": {
+      "main": [
+        [
+          {
+            "node": "Precisa de humano?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Precisa de humano?": {
+      "main": [
+        [
+          {
+            "node": "Responder com handoff",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder ao canal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "demo-whatsapp-triage"
+}

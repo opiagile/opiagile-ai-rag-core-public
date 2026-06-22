@@ -1,0 +1,19 @@
+Clinica Opiagile Demonstração - FAQ de Atendimento
+
+Horario de atendimento:
+A clinica atende de segunda a sexta, das 8h as 18h. Aos sabados, o atendimento ocorre das 8h as 12h, apenas com horario agendado.
+
+Agendamento:
+Para agendar uma consulta, o paciente deve informar nome completo, telefone, tipo de consulta desejada e preferencia de data ou periodo.
+
+Remarcacao:
+Consultas podem ser remarcadas com pelo menos 24 horas de antecedencia. O paciente deve informar o nome completo e o melhor novo horario.
+
+Cancelamento:
+Cancelamentos devem ser solicitados com antecedencia minima de 12 horas. Cancelamentos recorrentes podem exigir confirmacao manual da equipe.
+
+Documentos necessarios:
+O paciente deve levar documento com foto, carteirinha do convenio quando houver, exames recentes e pedido medico, se aplicavel.
+
+Handoff humano:
+O atendimento deve ser encaminhado para uma pessoa quando o paciente pedir um atendente, relatar uma reclamacao, mencionar urgencia medica ou quando a resposta nao estiver no FAQ.

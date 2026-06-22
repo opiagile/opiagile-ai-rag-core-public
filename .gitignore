@@ -1,0 +1,38 @@
+# Segredos e ambiente local
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Java / Maven
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Node / landing
+landing/node_modules/
+landing/dist/
+landing/.vite/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Dados de runtime
+postgres_data/
+
+# Python local
+__pycache__/
+*.pyc
+
+# Node / demo UI
+demo-ui/node_modules/
+demo-ui/dist/

@@ -1,0 +1,16 @@
+Suporte Tecnico Opiagile Demonstração - FAQ de Atendimento
+
+Horario de suporte:
+O suporte atende de segunda a sexta, das 8h as 19h. Chamados criticos de clientes com contrato premium podem ser encaminhados para plantao.
+
+Abertura de chamado:
+Para abrir um chamado, informe nome, email, empresa, produto afetado, descricao do problema, horario de ocorrencia e prints quando disponiveis.
+
+Prazo de resposta:
+Chamados comuns recebem primeira resposta em ate 8 horas uteis. Chamados criticos recebem primeira resposta em ate 2 horas uteis.
+
+Redefinicao de senha:
+O usuario pode solicitar redefinicao de senha pelo portal. Se nao tiver acesso ao email cadastrado, o caso deve ser encaminhado para humano.
+
+Handoff humano:
+Encaminhe para humano em caso de indisponibilidade total, problema financeiro, reclamacao, falha recorrente ou quando o usuario pedir atendimento humano.

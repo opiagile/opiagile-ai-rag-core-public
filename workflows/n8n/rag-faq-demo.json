@@ -1,0 +1,122 @@
+{
+  "name": "Opiagile - RAG FAQ demo",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "opiagile/rag-faq",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-faq",
+      "name": "Receber pergunta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OPIAGILE_API_URL || \"http://host.docker.internal:8080\"}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify({message:$json.body.message, channel:\"N8N\", contactId:$json.body.contactId || \"faq-demo\"})}}"
+      },
+      "id": "api-chat",
+      "name": "Consultar RAG",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "resposta",
+              "value": "={{$json.answer}}",
+              "type": "string"
+            },
+            {
+              "name": "fontes",
+              "value": "={{$json.sources}}",
+              "type": "array"
+            },
+            {
+              "name": "conversa",
+              "value": "={{$json.conversationId}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "formatar-resposta",
+      "name": "Formatar resposta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}"
+      },
+      "id": "responder-faq",
+      "name": "Responder FAQ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Receber pergunta": {
+      "main": [
+        [
+          {
+            "node": "Consultar RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar RAG": {
+      "main": [
+        [
+          {
+            "node": "Formatar resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar resposta": {
+      "main": [
+        [
+          {
+            "node": "Responder FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "demo-rag-faq"
+}

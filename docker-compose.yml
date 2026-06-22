@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16-trixie
+    container_name: opiagile-ai-rag-core-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-opiagile_ai_rag_core}
+      POSTGRES_USER: ${POSTGRES_USER:-opiagile}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opiagile_dev_password}
+    ports:
+      - "${POSTGRES_CONTAINER_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  adminer:
+    image: adminer:4
+    container_name: opiagile-ai-rag-core-adminer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+
+volumes:
+  postgres_data:
