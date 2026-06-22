@@ -2,8 +2,6 @@
 
 Core de RAG da Opiagile para ingestão de documentos, embeddings, recuperação com fontes, geração conversacional com LLM opcional, memória, handoff e observabilidade.
 
-Esta é a versão pública de amostragem do core. O repositório privado original continua sendo usado para evolução interna, deploys e próximos incrementos.
-
 Este repositório é o backend/API. Interfaces visuais e canais externos devem evoluir em repositórios separados.
 
 ## Posicionamento
@@ -50,16 +48,10 @@ Nome lógico do projeto:
 opiagile-ai-rag-core
 ```
 
-Nome do repositório público:
-
-```text
-opiagile-ai-rag-core-public
-```
-
 URL do repositório:
 
 ```text
-https://github.com/opiagile/opiagile-ai-rag-core-public
+https://github.com/opiagile/opiagile-ai-rag-core
 ```
 
 ## Stack
@@ -146,6 +138,18 @@ GET  /api/observability/conversations/{id}/trace
 Endpoints legados de WhatsApp ainda existem como referência técnica para futura extração, mas não são o foco evolutivo deste core.
 
 ## Upload De Documento
+
+Por segurança, a demo limita uploads antes de indexar o conteúdo. Os limites padrão são:
+
+```text
+DOCUMENT_UPLOAD_MAX_BYTES=262144
+DOCUMENT_UPLOAD_MAX_CHARS=200000
+DOCUMENT_UPLOAD_MAX_CHUNKS=300
+SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=256KB
+SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=300KB
+```
+
+Também são aplicados UTF-8 obrigatório, sanitização de nome de arquivo e rejeição de arquivos que gerem chunks demais.
 
 ```bash
 python3 - <<'PY'

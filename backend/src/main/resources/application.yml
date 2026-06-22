@@ -9,6 +9,10 @@ server:
 spring:
   application:
     name: ${app.name}
+  servlet:
+    multipart:
+      max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:256KB}
+      max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE:300KB}
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:opiagile_ai_rag_core}
     username: ${POSTGRES_USER:opiagile}
@@ -47,6 +51,10 @@ chat:
   system-tone: ${CHAT_SYSTEM_TONE:profissional, claro, acolhedor e objetivo}
 
 documents:
+  upload:
+    max-bytes: ${DOCUMENT_UPLOAD_MAX_BYTES:262144}
+    max-chars: ${DOCUMENT_UPLOAD_MAX_CHARS:200000}
+    max-chunks: ${DOCUMENT_UPLOAD_MAX_CHUNKS:300}
   chunk:
     max-chars: ${DOCUMENT_CHUNK_MAX_CHARS:900}
     overlap-chars: ${DOCUMENT_CHUNK_OVERLAP_CHARS:120}

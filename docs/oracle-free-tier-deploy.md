@@ -7,7 +7,7 @@ Este guia não assume acesso SSH por agente. Todos os comandos abaixo são para 
 ## Dados Da VPS
 
 ```text
-IP público: <IP_PUBLICO_DA_VPS>
+IP público: 136.248.83.176
 Usuário SSH: ubuntu
 Sistema: Ubuntu 24.04 ARM / aarch64
 Shape: Oracle VM.Standard.A1.Flex
@@ -15,13 +15,13 @@ CPU: 2 OCPUs
 RAM: 12 GB
 Disco: 200 GB
 Arquitetura: ARM64
-Chave SSH local: ~/.ssh/sua_chave_oracle
+Chave SSH local: ~/.ssh/opiagile_oracle_cloud
 ```
 
 Acesso:
 
 ```bash
-ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
+ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
 ```
 
 ## 1. Checklist De Pré-Requisitos
@@ -31,7 +31,7 @@ Antes de iniciar:
 - A VPS precisa estar acessível por SSH.
 - A regra de entrada da Oracle Cloud precisa permitir TCP `22`.
 - Para web/HTTPS, a Security List ou NSG da Oracle também deve permitir TCP `80` e `443`.
-- Se for usar HTTPS automático, o domínio ou subdomínio deve apontar para `<IP_PUBLICO_DA_VPS>`.
+- Se for usar HTTPS automático, o domínio ou subdomínio deve apontar para `136.248.83.176`.
 - Não exponha PostgreSQL na internet.
 - Não rode LLM pesado local na VPS. Use APIs externas para LLM e embeddings.
 - Tenha uma chave OpenAI somente se quiser ativar LLM/embeddings reais.
@@ -56,7 +56,7 @@ sudo reboot
 Reconecte após o reboot:
 
 ```bash
-ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
+ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
 ```
 
 Confirme arquitetura:
@@ -113,7 +113,7 @@ Saia e reconecte:
 
 ```bash
 exit
-ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
+ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
 ```
 
 Valide:
@@ -135,14 +135,14 @@ cd /opt/opiagile
 Clone a branch `develop`:
 
 ```bash
-git clone -b develop https://github.com/opiagile/opiagile-ai-rag-core-public.git opiagile-ai-rag-core
+git clone -b develop https://github.com/opiagile/opiagile-ai-rag-core.git opiagile-ai-rag-core
 cd /opt/opiagile/opiagile-ai-rag-core
 ```
 
 Se a branch `develop` ainda não existir no remoto, crie a partir da sua máquina local ou use temporariamente `main`:
 
 ```bash
-git clone -b main https://github.com/opiagile/opiagile-ai-rag-core-public.git opiagile-ai-rag-core
+git clone -b main https://github.com/opiagile/opiagile-ai-rag-core.git opiagile-ai-rag-core
 ```
 
 ## 5. Arquivos De Deploy
@@ -230,7 +230,7 @@ Não instale Redis agora. Isso reduz consumo de RAM, superfície de ataque e man
 
 O deploy usa Caddy por simplicidade:
 
-- sem domínio: HTTP em `http://<IP_PUBLICO_DA_VPS>`;
+- sem domínio: HTTP em `http://136.248.83.176`;
 - com domínio: HTTPS automático com Let's Encrypt.
 
 ### Sem Domínio
@@ -248,13 +248,13 @@ ACME_EMAIL=
 Antes, aponte um registro DNS `A` para:
 
 ```text
-<IP_PUBLICO_DA_VPS>
+136.248.83.176
 ```
 
 Exemplo:
 
 ```text
-rag.seudominio.com.br -> <IP_PUBLICO_DA_VPS>
+rag.opiagile.com.br -> 136.248.83.176
 ```
 
 No `.env`:
@@ -378,26 +378,46 @@ Health:
 
 ```bash
 curl -i http://localhost:8080/actuator/health
-curl -i http://<IP_PUBLICO_DA_VPS>/actuator/health
+curl -i http://136.248.83.176/actuator/health
 ```
 
 Versão:
 
 ```bash
-curl -s http://<IP_PUBLICO_DA_VPS>/api/version | jq
+curl -s http://136.248.83.176/api/version | jq
 ```
 
 Upload de documento:
 
 ```bash
 cd /opt/opiagile/opiagile-ai-rag-core
-curl -F "file=@samples/clinica/faq.txt" http://<IP_PUBLICO_DA_VPS>/api/documents/upload | jq
+curl -F "file=@samples/clinica/faq.txt" http://136.248.83.176/api/documents/upload | jq
+```
+
+Upload acima do limite da demo deve retornar erro controlado:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+Path('/tmp/rag-arquivo-grande.txt').write_text('a' * 270000)
+PY
+curl -i -F "file=@/tmp/rag-arquivo-grande.txt" http://136.248.83.176/api/documents/upload
+```
+
+Limites controlados por `.env` no deploy:
+
+```text
+DOCUMENT_UPLOAD_MAX_BYTES=262144
+DOCUMENT_UPLOAD_MAX_CHARS=200000
+DOCUMENT_UPLOAD_MAX_CHUNKS=300
+SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=256KB
+SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=300KB
 ```
 
 Chat:
 
 ```bash
-curl -s http://<IP_PUBLICO_DA_VPS>/api/chat \
+curl -s http://136.248.83.176/api/chat \
   -H "Content-Type: application/json" \
   -d '{
     "message": "Vocês atendem aos sábados?",
@@ -427,7 +447,7 @@ Correção:
 ```bash
 sudo usermod -aG docker ubuntu
 exit
-ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
+ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
 ```
 
 ### API não sobe
@@ -465,7 +485,7 @@ docker compose --env-file .env logs --tail=200 caddy
 
 Confirme:
 
-- domínio aponta para `<IP_PUBLICO_DA_VPS>`;
+- domínio aponta para `136.248.83.176`;
 - portas `80` e `443` liberadas no UFW;
 - portas `80` e `443` liberadas na Oracle Cloud;
 - `CADDYFILE_PATH=./Caddyfile.https`;
@@ -507,7 +527,7 @@ Ele só faz deploy quando:
 Secrets sugeridos:
 
 ```text
-ORACLE_HOST=<IP_PUBLICO_DA_VPS>
+ORACLE_HOST=136.248.83.176
 ORACLE_USER=ubuntu
 ORACLE_SSH_KEY=<conteúdo da chave privada de deploy>
 ORACLE_SSH_PORT=22

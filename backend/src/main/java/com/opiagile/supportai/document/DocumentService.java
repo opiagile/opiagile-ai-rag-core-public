@@ -1,11 +1,15 @@
 package com.opiagile.supportai.document;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,16 +23,34 @@ public class DocumentService {
     private final DocumentChunkRepository chunkRepository;
     private final DocumentChunker chunker;
     private final EmbeddingProvider embeddingProvider;
+    private final long maxUploadBytes;
+    private final int maxUploadChars;
+    private final int maxUploadChunks;
 
     public DocumentService(
             DocumentRepository documentRepository,
             DocumentChunkRepository chunkRepository,
             DocumentChunker chunker,
-            EmbeddingProvider embeddingProvider) {
+            EmbeddingProvider embeddingProvider,
+            @Value("${documents.upload.max-bytes:262144}") long maxUploadBytes,
+            @Value("${documents.upload.max-chars:200000}") int maxUploadChars,
+            @Value("${documents.upload.max-chunks:300}") int maxUploadChunks) {
+        if (maxUploadBytes < 1024) {
+            throw new IllegalArgumentException("documents.upload.max-bytes deve ser maior ou igual a 1024");
+        }
+        if (maxUploadChars < 100) {
+            throw new IllegalArgumentException("documents.upload.max-chars deve ser maior ou igual a 100");
+        }
+        if (maxUploadChunks < 1) {
+            throw new IllegalArgumentException("documents.upload.max-chunks deve ser maior ou igual a 1");
+        }
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
         this.chunker = chunker;
         this.embeddingProvider = embeddingProvider;
+        this.maxUploadBytes = maxUploadBytes;
+        this.maxUploadChars = maxUploadChars;
+        this.maxUploadChunks = maxUploadChunks;
     }
 
     @Transactional
@@ -38,6 +60,9 @@ public class DocumentService {
         List<String> chunks = chunker.chunk(content);
         if (chunks.isEmpty()) {
             throw new IllegalArgumentException("O arquivo TXT não possui conteúdo indexável.");
+        }
+        if (chunks.size() > maxUploadChunks) {
+            throw new IllegalArgumentException("O arquivo gerou chunks demais para a demo. Reduza o conteúdo e tente novamente.");
         }
 
         DocumentRecord document = documentRepository.save(
@@ -109,11 +134,24 @@ public class DocumentService {
         if (!txtFilename || !textContentType) {
             throw new IllegalArgumentException("Nesta fase, apenas arquivos .txt são suportados.");
         }
+        if (file.getSize() > maxUploadBytes) {
+            throw new IllegalArgumentException("Arquivo muito grande. O limite atual para a demo é " + humanBytes(maxUploadBytes) + ".");
+        }
     }
 
     private String readContent(MultipartFile file) {
         try {
-            return new String(file.getBytes(), StandardCharsets.UTF_8);
+            String content = StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(file.getBytes()))
+                    .toString();
+            if (content.length() > maxUploadChars) {
+                throw new IllegalArgumentException("Arquivo com texto demais para a demo. O limite atual é " + maxUploadChars + " caracteres.");
+            }
+            return content;
+        } catch (CharacterCodingException exception) {
+            throw new IllegalArgumentException("O arquivo TXT deve estar codificado em UTF-8 válido.");
         } catch (IOException exception) {
             throw new IllegalArgumentException("Não foi possível ler o arquivo enviado.");
         }
@@ -125,7 +163,14 @@ public class DocumentService {
             return "documento.txt";
         }
         String normalizedFilename = filename.replace("\\", "/");
-        return normalizedFilename.substring(normalizedFilename.lastIndexOf('/') + 1);
+        String safeName = normalizedFilename.substring(normalizedFilename.lastIndexOf('/') + 1)
+                .replaceAll("[\\p{Cntrl}]", "")
+                .replaceAll("[^A-Za-z0-9._ -]", "_")
+                .trim();
+        if (safeName.isBlank()) {
+            return "documento.txt";
+        }
+        return safeName.length() > 120 ? safeName.substring(0, 120) : safeName;
     }
 
     private String contentType(MultipartFile file) {
@@ -138,5 +183,15 @@ public class DocumentService {
 
     private String escapeJson(String value) {
         return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    private String humanBytes(long bytes) {
+        if (bytes >= 1024 * 1024) {
+            return (bytes / (1024 * 1024)) + " MB";
+        }
+        if (bytes >= 1024) {
+            return (bytes / 1024) + " KB";
+        }
+        return bytes + " bytes";
     }
 }
