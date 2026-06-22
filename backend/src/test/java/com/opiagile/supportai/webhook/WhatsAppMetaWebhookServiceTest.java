@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opiagile.supportai.chat.ChatRequest;
 import com.opiagile.supportai.chat.ChatResponse;
 import com.opiagile.supportai.chat.ChatService;
+import com.opiagile.supportai.tenant.TenantContext;
+import com.opiagile.supportai.tenant.TenantContextResolver;
 
 class WhatsAppMetaWebhookServiceTest {
 
@@ -25,7 +27,7 @@ class WhatsAppMetaWebhookServiceTest {
     void deveProcessarTextoPermitidoEmDryRun() {
         Fixture fixture = fixture(true, false);
         UUID conversationId = UUID.randomUUID();
-        when(fixture.chatService.answer(any(ChatRequest.class))).thenReturn(new ChatResponse(
+        when(fixture.chatService.answer(any(TenantContext.class), any(ChatRequest.class))).thenReturn(new ChatResponse(
                 conversationId,
                 "Resposta de teste",
                 "AGENDAR",
@@ -48,7 +50,7 @@ class WhatsAppMetaWebhookServiceTest {
         assertThat(response.processed()).isTrue();
         assertThat(response.conversationId()).isEqualTo(conversationId);
         assertThat(response.outboundStatus()).isEqualTo("DRY_RUN");
-        verify(fixture.chatService).answer(any(ChatRequest.class));
+        verify(fixture.chatService).answer(any(TenantContext.class), any(ChatRequest.class));
     }
 
     @Test
@@ -59,7 +61,7 @@ class WhatsAppMetaWebhookServiceTest {
 
         assertThat(response.processed()).isFalse();
         assertThat(response.blockedReason()).isEqualTo("NUMERO_FORA_DA_ALLOWLIST");
-        verify(fixture.chatService, never()).answer(any(ChatRequest.class));
+        verify(fixture.chatService, never()).answer(any(TenantContext.class), any(ChatRequest.class));
     }
 
     @Test
@@ -70,7 +72,7 @@ class WhatsAppMetaWebhookServiceTest {
 
         assertThat(response.processed()).isFalse();
         assertThat(response.blockedReason()).isEqualTo("STATUS_IGNORADO");
-        verify(fixture.chatService, never()).answer(any(ChatRequest.class));
+        verify(fixture.chatService, never()).answer(any(TenantContext.class), any(ChatRequest.class));
     }
 
     @Test
@@ -80,7 +82,7 @@ class WhatsAppMetaWebhookServiceTest {
         fixture.properties.setAppSecret("segredo");
 
         org.junit.jupiter.api.Assertions.assertThrows(ResponseStatusException.class, () -> fixture.service.process(textPayload(), null));
-        verify(fixture.chatService, never()).answer(any(ChatRequest.class));
+        verify(fixture.chatService, never()).answer(any(TenantContext.class), any(ChatRequest.class));
     }
 
     private Fixture fixture(boolean allowed, boolean signatureRequired) {
@@ -91,6 +93,13 @@ class WhatsAppMetaWebhookServiceTest {
         properties.setSignatureRequired(signatureRequired);
         properties.setAllowedTestNumbers(allowed ? List.of("5511999998888") : List.of("5511777776666"));
         ChatService chatService = mock(ChatService.class);
+        TenantContextResolver tenantContextResolver = mock(TenantContextResolver.class);
+        when(tenantContextResolver.resolve(null, null)).thenReturn(new TenantContext(
+                UUID.randomUUID(),
+                "demo",
+                UUID.randomUUID(),
+                "clinica-demo",
+                "Clínica Demo"));
         DefaultWhatsAppOutboundService outboundService = mock(DefaultWhatsAppOutboundService.class);
         WhatsAppWebhookEventRepository repository = mock(WhatsAppWebhookEventRepository.class);
         WhatsAppMetaWebhookService service = new WhatsAppMetaWebhookService(
@@ -102,6 +111,7 @@ class WhatsAppMetaWebhookServiceTest {
                 chatService,
                 outboundService,
                 repository,
+                tenantContextResolver,
                 "local");
         return new Fixture(properties, chatService, outboundService, service);
     }

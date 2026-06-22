@@ -76,6 +76,10 @@ rag:
 conversation:
   history-limit: ${CONVERSATION_HISTORY_LIMIT:8}
 
+tenant:
+  default-tenant: ${TENANT_DEFAULT_TENANT:demo}
+  default-workspace: ${TENANT_DEFAULT_WORKSPACE:clinica-demo}
+
 intent:
   llm:
     enabled: ${INTENT_LLM_ENABLED:false}

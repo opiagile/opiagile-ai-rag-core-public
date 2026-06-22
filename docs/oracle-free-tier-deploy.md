@@ -444,6 +444,8 @@ Chat:
 ```bash
 curl -s http://136.248.83.176/api/chat \
   -H "Content-Type: application/json" \
+  -H "X-Tenant-Id: demo" \
+  -H "X-Workspace-Id: clinica-demo" \
   -d '{
     "message": "Vocês atendem aos sábados?",
     "channel": "WEB",

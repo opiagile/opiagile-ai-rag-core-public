@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.opiagile.supportai.tenant.TenantContext;
+
 @Service
 public class RagRetrievalService {
 
@@ -29,26 +31,26 @@ public class RagRetrievalService {
         this.minScore = Math.max(0.0, minScore);
     }
 
-    public List<RetrievedChunk> retrieve(String query) {
+    public List<RetrievedChunk> retrieve(TenantContext tenantContext, String query) {
         Optional<float[]> queryEmbedding = embeddingProvider.embed(query);
         if (queryEmbedding.isPresent()) {
-            List<RetrievedChunk> vectorChunks = retrieveByVector(queryEmbedding.get());
+            List<RetrievedChunk> vectorChunks = retrieveByVector(tenantContext, queryEmbedding.get());
             if (!vectorChunks.isEmpty()) {
                 return vectorChunks;
             }
         }
-        return retrieveByText(query);
+        return retrieveByText(tenantContext, query);
     }
 
-    private List<RetrievedChunk> retrieveByVector(float[] queryEmbedding) {
-        return chunkRepository.findNearestIndexedChunks(queryEmbedding, topK).stream()
+    private List<RetrievedChunk> retrieveByVector(TenantContext tenantContext, float[] queryEmbedding) {
+        return chunkRepository.findNearestIndexedChunks(tenantContext, queryEmbedding, topK).stream()
                 .filter(chunk -> chunk.score() != null && chunk.score() >= minScore)
                 .map(chunk -> toVectorRetrievedChunk(chunk))
                 .toList();
     }
 
-    private List<RetrievedChunk> retrieveByText(String query) {
-        return chunkRepository.findAllIndexedChunks().stream()
+    private List<RetrievedChunk> retrieveByText(TenantContext tenantContext, String query) {
+        return chunkRepository.findAllIndexedChunks(tenantContext).stream()
                 .map(chunk -> toTextRetrievedChunk(query, chunk))
                 .filter(chunk -> chunk.score() >= minScore)
                 .sorted(Comparator.comparingDouble(RetrievedChunk::score).reversed())

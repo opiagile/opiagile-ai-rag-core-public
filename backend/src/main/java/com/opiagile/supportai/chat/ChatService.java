@@ -21,6 +21,7 @@ import com.opiagile.supportai.lead.LeadStatus;
 import com.opiagile.supportai.rag.RagRetrievalService;
 import com.opiagile.supportai.rag.RetrievalLogRepository;
 import com.opiagile.supportai.rag.RetrievedChunk;
+import com.opiagile.supportai.tenant.TenantContext;
 
 @Service
 public class ChatService {
@@ -59,9 +60,10 @@ public class ChatService {
         this.chatModelProvider = chatModelProvider;
     }
 
-    public ChatResponse answer(ChatRequest request) {
+    public ChatResponse answer(TenantContext tenantContext, ChatRequest request) {
         Instant startedAt = Instant.now();
         UUID conversationId = conversationRepository.ensureConversation(
+                tenantContext,
                 request.conversationId(),
                 normalizeChannel(request.channel()),
                 request.contactId());
@@ -72,7 +74,7 @@ public class ChatService {
         messageRepository.save(conversationId, "USER", request.message(), intent.name());
 
         String retrievalQuery = memoryService.buildRetrievalQuery(recentMessages, request.message());
-        List<RetrievedChunk> retrievedChunks = ragRetrievalService.retrieve(retrievalQuery);
+        List<RetrievedChunk> retrievedChunks = ragRetrievalService.retrieve(tenantContext, retrievalQuery);
         long latencyMs = Duration.between(startedAt, Instant.now()).toMillis();
 
         List<ChatSourceResponse> sources = retrievedChunks.stream()
@@ -99,6 +101,7 @@ public class ChatService {
                 ? fallbackReason
                 : generation.fallbackReason();
         retrievalLogRepository.save(
+                tenantContext,
                 conversationId,
                 retrievalQuery,
                 retrievedChunks,

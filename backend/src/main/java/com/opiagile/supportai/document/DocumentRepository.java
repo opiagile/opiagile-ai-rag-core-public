@@ -9,6 +9,8 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import com.opiagile.supportai.tenant.TenantContext;
+
 @Repository
 public class DocumentRepository {
 
@@ -18,12 +20,17 @@ public class DocumentRepository {
         this.jdbc = jdbc;
     }
 
-    public DocumentRecord save(String filename, String contentType, String sourceType, DocumentStatus status) {
+    public DocumentRecord save(TenantContext tenantContext, String filename, String contentType, String sourceType, DocumentStatus status) {
         return jdbc.sql("""
-                INSERT INTO documents (filename, content_type, source_type, status)
-                VALUES (:filename, :contentType, :sourceType, :status)
-                RETURNING id, filename, content_type, source_type, status, created_at
+                INSERT INTO documents (tenant_id, workspace_id, filename, content_type, source_type, status)
+                VALUES (:tenantId, :workspaceId, :filename, :contentType, :sourceType, :status)
+                RETURNING id,
+                          (SELECT slug FROM tenants WHERE id = tenant_id) AS tenant_slug,
+                          (SELECT slug FROM workspaces WHERE id = workspace_id) AS workspace_slug,
+                          filename, content_type, source_type, status, created_at
                 """)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .param("filename", filename)
                 .param("contentType", contentType)
                 .param("sourceType", sourceType)
@@ -32,23 +39,37 @@ public class DocumentRepository {
                 .single();
     }
 
-    public List<DocumentRecord> findAll() {
+    public List<DocumentRecord> findAll(TenantContext tenantContext) {
         return jdbc.sql("""
-                SELECT id, filename, content_type, source_type, status, created_at
-                FROM documents
-                ORDER BY created_at DESC
+                SELECT d.id, t.slug AS tenant_slug, w.slug AS workspace_slug,
+                       d.filename, d.content_type, d.source_type, d.status, d.created_at
+                FROM documents d
+                JOIN tenants t ON t.id = d.tenant_id
+                JOIN workspaces w ON w.id = d.workspace_id
+                WHERE d.tenant_id = :tenantId
+                  AND d.workspace_id = :workspaceId
+                ORDER BY d.created_at DESC
                 """)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .query(this::map)
                 .list();
     }
 
-    public Optional<DocumentRecord> findById(UUID id) {
+    public Optional<DocumentRecord> findById(TenantContext tenantContext, UUID id) {
         return jdbc.sql("""
-                SELECT id, filename, content_type, source_type, status, created_at
-                FROM documents
-                WHERE id = :id
+                SELECT d.id, t.slug AS tenant_slug, w.slug AS workspace_slug,
+                       d.filename, d.content_type, d.source_type, d.status, d.created_at
+                FROM documents d
+                JOIN tenants t ON t.id = d.tenant_id
+                JOIN workspaces w ON w.id = d.workspace_id
+                WHERE d.id = :id
+                  AND d.tenant_id = :tenantId
+                  AND d.workspace_id = :workspaceId
                 """)
                 .param("id", id)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .query(this::map)
                 .optional();
     }
@@ -61,8 +82,15 @@ public class DocumentRepository {
         return count == null ? 0 : count;
     }
 
-    public int countDocuments() {
-        Integer count = jdbc.sql("SELECT count(*) FROM documents")
+    public int countDocuments(TenantContext tenantContext) {
+        Integer count = jdbc.sql("""
+                SELECT count(*)
+                FROM documents
+                WHERE tenant_id = :tenantId
+                  AND workspace_id = :workspaceId
+                """)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .query(Integer.class)
                 .single();
         return count == null ? 0 : count;
@@ -71,6 +99,8 @@ public class DocumentRepository {
     private DocumentRecord map(ResultSet rs, int rowNum) throws SQLException {
         return new DocumentRecord(
                 rs.getObject("id", UUID.class),
+                rs.getString("tenant_slug"),
+                rs.getString("workspace_slug"),
                 rs.getString("filename"),
                 rs.getString("content_type"),
                 rs.getString("source_type"),

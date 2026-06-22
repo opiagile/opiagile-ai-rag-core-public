@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.opiagile.supportai.chat.ChatRequest;
 import com.opiagile.supportai.chat.ChatResponse;
 import com.opiagile.supportai.chat.ChatService;
+import com.opiagile.supportai.tenant.TenantContextResolver;
 
 @Service
 public class WhatsAppMetaWebhookService {
@@ -22,6 +23,7 @@ public class WhatsAppMetaWebhookService {
     private final ChatService chatService;
     private final DefaultWhatsAppOutboundService outboundService;
     private final WhatsAppWebhookEventRepository eventRepository;
+    private final TenantContextResolver tenantContextResolver;
     private final String environment;
 
     public WhatsAppMetaWebhookService(
@@ -33,6 +35,7 @@ public class WhatsAppMetaWebhookService {
             ChatService chatService,
             DefaultWhatsAppOutboundService outboundService,
             WhatsAppWebhookEventRepository eventRepository,
+            TenantContextResolver tenantContextResolver,
             @Value("${app.environment:local}") String environment) {
         this.properties = properties;
         this.signatureVerifier = signatureVerifier;
@@ -42,6 +45,7 @@ public class WhatsAppMetaWebhookService {
         this.chatService = chatService;
         this.outboundService = outboundService;
         this.eventRepository = eventRepository;
+        this.tenantContextResolver = tenantContextResolver;
         this.environment = environment;
     }
 
@@ -76,11 +80,13 @@ public class WhatsAppMetaWebhookService {
             eventRepository.save(provider(), event.messageId(), null, maskedPhone, event.eventType(), false, reason, properties.isDryRun(), properties.isSendEnabled(), "BLOCKED");
             return accepted(false, reason, maskedPhone, null, "BLOCKED");
         }
-        ChatResponse chatResponse = chatService.answer(new ChatRequest(
-                null,
-                messageWithName(event),
-                "WHATSAPP",
-                PhoneNumberMasker.normalize(event.from())));
+        ChatResponse chatResponse = chatService.answer(
+                tenantContextResolver.resolve(null, null),
+                new ChatRequest(
+                        null,
+                        messageWithName(event),
+                        "WHATSAPP",
+                        PhoneNumberMasker.normalize(event.from())));
         WhatsAppSendResult sendResult = outboundService.send(event.from(), chatResponse.answer());
         eventRepository.save(provider(), event.messageId(), chatResponse.conversationId(), maskedPhone, event.eventType(), true,
                 sendResult.blockedReason(), properties.isDryRun(), properties.isSendEnabled(), sendResult.status());

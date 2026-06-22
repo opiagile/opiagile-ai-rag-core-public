@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.opiagile.supportai.chat.ChatRequest;
 import com.opiagile.supportai.chat.ChatResponse;
 import com.opiagile.supportai.chat.ChatService;
+import com.opiagile.supportai.tenant.TenantContextResolver;
 
 import jakarta.validation.Valid;
 
@@ -28,27 +29,32 @@ public class WhatsappWebhookController {
     private final WhatsAppProperties properties;
     private final WhatsAppTesterAllowlistService allowlistService;
     private final WhatsAppMetaWebhookService metaWebhookService;
+    private final TenantContextResolver tenantContextResolver;
 
     public WhatsappWebhookController(
             ChatService chatService,
             WhatsAppProvider whatsAppProvider,
             WhatsAppProperties properties,
             WhatsAppTesterAllowlistService allowlistService,
-            WhatsAppMetaWebhookService metaWebhookService) {
+            WhatsAppMetaWebhookService metaWebhookService,
+            TenantContextResolver tenantContextResolver) {
         this.chatService = chatService;
         this.whatsAppProvider = whatsAppProvider;
         this.properties = properties;
         this.allowlistService = allowlistService;
         this.metaWebhookService = metaWebhookService;
+        this.tenantContextResolver = tenantContextResolver;
     }
 
     @PostMapping
     public WhatsappWebhookResponse receive(@Valid @RequestBody WhatsappWebhookRequest request) {
-        ChatResponse chatResponse = chatService.answer(new ChatRequest(
-                null,
-                messageWithName(request),
-                "WHATSAPP",
-                request.from()));
+        ChatResponse chatResponse = chatService.answer(
+                tenantContextResolver.resolve(null, null),
+                new ChatRequest(
+                        null,
+                        messageWithName(request),
+                        "WHATSAPP",
+                        request.from()));
         whatsAppProvider.sendMessage(request.from(), chatResponse.answer());
         return new WhatsappWebhookResponse(
                 whatsAppProvider.providerName(),

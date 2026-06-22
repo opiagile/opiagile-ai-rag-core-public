@@ -1,5 +1,18 @@
 # Exemplos De API
 
+## Workspaces
+
+```bash
+curl http://localhost:8080/api/workspaces
+```
+
+Use os headers abaixo para isolar upload, listagem e chat por tenant/workspace:
+
+```text
+X-Tenant-Id: demo
+X-Workspace-Id: clinica-demo
+```
+
 ## Upload TXT
 
 ```bash
@@ -8,7 +21,15 @@ import pathlib, urllib.request, uuid
 boundary = '----opiagile' + uuid.uuid4().hex
 path = pathlib.Path('samples/clinica/faq.txt')
 body = (f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{path.name}"\r\nContent-Type: text/plain\r\n\r\n').encode() + path.read_bytes() + f'\r\n--{boundary}--\r\n'.encode()
-req = urllib.request.Request('http://localhost:8080/api/documents/upload', data=body, headers={'Content-Type': f'multipart/form-data; boundary={boundary}'}, method='POST')
+req = urllib.request.Request(
+    'http://localhost:8080/api/documents/upload',
+    data=body,
+    headers={
+        'Content-Type': f'multipart/form-data; boundary={boundary}',
+        'X-Tenant-Id': 'demo',
+        'X-Workspace-Id': 'clinica-demo',
+    },
+    method='POST')
 print(urllib.request.urlopen(req).read().decode())
 PY
 ```

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
 import com.opiagile.supportai.chat.ChatService;
+import com.opiagile.supportai.tenant.TenantContextResolver;
 
 class WhatsappWebhookControllerTest {
 
@@ -21,7 +22,8 @@ class WhatsappWebhookControllerTest {
                 mock(WhatsAppProvider.class),
                 properties,
                 new WhatsAppTesterAllowlistService(properties),
-                mock(WhatsAppMetaWebhookService.class));
+                mock(WhatsAppMetaWebhookService.class),
+                mock(TenantContextResolver.class));
 
         ResponseEntity<String> response = controller.verifyMetaWebhook("subscribe", "token-local", "12345");
 
@@ -38,7 +40,8 @@ class WhatsappWebhookControllerTest {
                 mock(WhatsAppProvider.class),
                 properties,
                 new WhatsAppTesterAllowlistService(properties),
-                mock(WhatsAppMetaWebhookService.class));
+                mock(WhatsAppMetaWebhookService.class),
+                mock(TenantContextResolver.class));
 
         ResponseEntity<String> response = controller.verifyMetaWebhook("subscribe", "errado", "12345");
 
@@ -62,7 +65,8 @@ class WhatsappWebhookControllerTest {
                 mock(WhatsAppProvider.class),
                 properties,
                 new WhatsAppTesterAllowlistService(properties),
-                mock(WhatsAppMetaWebhookService.class));
+                mock(WhatsAppMetaWebhookService.class),
+                mock(TenantContextResolver.class));
 
         WhatsAppStatusResponse response = controller.status();
 

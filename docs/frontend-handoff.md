@@ -33,16 +33,44 @@ opiagile-whatsapp-ai-gateway
 A interface deve demonstrar o core para usuário leigo com fluxo claro:
 
 1. verificar se a API está online;
-2. enviar um arquivo `.txt`;
-3. listar documentos indexados;
-4. fazer pergunta no chat;
-5. ver resposta em formato de conversa;
-6. ver fontes usadas;
-7. ver modo de resposta (`DEMO` ou `LLM`);
-8. ver intenção, lead status e handoff;
-9. consultar trace básico da conversa.
+2. escolher o workspace demo;
+3. enviar um arquivo `.txt` para o workspace selecionado;
+4. listar documentos indexados do workspace;
+5. fazer pergunta no chat;
+6. ver resposta em formato de conversa;
+7. ver fontes usadas;
+8. ver modo de resposta (`DEMO` ou `LLM`);
+9. ver intenção, lead status e handoff;
+10. consultar trace básico da conversa.
 
 O frontend não deve armazenar segredos, tokens ou chaves de provedor.
+
+## Escopo Multi-Tenant
+
+O core usa headers para isolar documentos, conversas e retrieval:
+
+```text
+X-Tenant-Id: demo
+X-Workspace-Id: clinica-demo
+```
+
+Workspaces demo:
+
+| Workspace | Tela sugerida | Sample sugerido |
+| --- | --- | --- |
+| `clinica-demo` | Clínica Demo | `samples/clinica/faq.txt` |
+| `atendimento-demo` | Atendimento Demo | `samples/atendimento/faq.txt` |
+| `locacao-demo` | Locação Demo | `samples/imobiliaria/faq.txt` |
+
+O frontend deve aplicar esses headers em:
+
+- `POST /api/documents/upload`;
+- `GET /api/documents`;
+- `GET /api/documents/{id}`;
+- `GET /api/documents/{id}/chunks`;
+- `POST /api/chat`.
+
+Também deve consumir `GET /api/workspaces` para montar as telas/abas disponíveis.
 
 ## Base URL
 
@@ -266,7 +294,7 @@ Use `samples/clinica/faq.txt` para uma primeira demonstração:
 Ambiente atual de validação:
 
 ```text
-http://<IP_PUBLICO_DA_VPS>
+http://136.248.83.176
 ```
 
 Testes mínimos:

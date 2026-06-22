@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import com.opiagile.supportai.rag.EmbeddingVectorCodec;
+import com.opiagile.supportai.tenant.TenantContext;
 
 @Repository
 public class DocumentChunkRepository {
@@ -56,14 +57,19 @@ public class DocumentChunkRepository {
                 .single();
     }
 
-    public List<DocumentChunkRecord> findByDocumentId(UUID documentId) {
+    public List<DocumentChunkRecord> findByDocumentId(TenantContext tenantContext, UUID documentId) {
         return jdbc.sql("""
-                SELECT id, document_id, chunk_index, content, metadata::text AS metadata, created_at
-                FROM document_chunks
-                WHERE document_id = :documentId
+                SELECT dc.id, dc.document_id, dc.chunk_index, dc.content, dc.metadata::text AS metadata, dc.created_at
+                FROM document_chunks dc
+                JOIN documents d ON d.id = dc.document_id
+                WHERE dc.document_id = :documentId
+                  AND d.tenant_id = :tenantId
+                  AND d.workspace_id = :workspaceId
                 ORDER BY chunk_index
                 """)
                 .param("documentId", documentId)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .query(this::map)
                 .list();
     }

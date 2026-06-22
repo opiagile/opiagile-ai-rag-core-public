@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opiagile.supportai.tenant.TenantContext;
 
 @Repository
 public class RetrievalLogRepository {
@@ -22,6 +23,7 @@ public class RetrievalLogRepository {
     }
 
     public void save(
+            TenantContext tenantContext,
             UUID conversationId,
             String query,
             List<RetrievedChunk> chunks,
@@ -39,14 +41,16 @@ public class RetrievalLogRepository {
             Integer totalTokens) {
         jdbc.sql("""
                 INSERT INTO retrieval_logs (
-                    conversation_id, query, retrieved_chunks, latency_ms, intent, handoff_required, fallback_reason,
+                    tenant_id, workspace_id, conversation_id, query, retrieved_chunks, latency_ms, intent, handoff_required, fallback_reason,
                     provider, response_mode, llm_provider, model, llm_latency_ms, prompt_tokens, completion_tokens, total_tokens
                 )
                 VALUES (
-                    :conversationId, :query, CAST(:retrievedChunks AS jsonb), :latencyMs, :intent, :handoffRequired, :fallbackReason,
+                    :tenantId, :workspaceId, :conversationId, :query, CAST(:retrievedChunks AS jsonb), :latencyMs, :intent, :handoffRequired, :fallbackReason,
                     :provider, :responseMode, :llmProvider, :model, :llmLatencyMs, :promptTokens, :completionTokens, :totalTokens
                 )
                 """)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .param("conversationId", conversationId)
                 .param("query", query)
                 .param("retrievedChunks", toJson(chunks))

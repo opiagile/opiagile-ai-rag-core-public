@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.opiagile.supportai.rag.EmbeddingProvider;
+import com.opiagile.supportai.tenant.TenantContext;
 
 @Service
 public class DocumentService {
@@ -60,9 +61,9 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentUploadResponse upload(MultipartFile file) {
+    public DocumentUploadResponse upload(TenantContext tenantContext, MultipartFile file) {
         validateTxt(file);
-        if (documentRepository.countDocuments() >= maxDocuments) {
+        if (documentRepository.countDocuments(tenantContext) >= maxDocuments) {
             throw new IllegalArgumentException("Limite de documentos da demo atingido. Remova dados de demonstração antes de enviar novo arquivo.");
         }
         String content = readContent(file);
@@ -75,6 +76,7 @@ public class DocumentService {
         }
 
         DocumentRecord document = documentRepository.save(
+                tenantContext,
                 safeFilename(file),
                 contentType(file),
                 "UPLOAD",
@@ -87,16 +89,20 @@ public class DocumentService {
 
         return new DocumentUploadResponse(
                 document.id(),
+                document.tenantSlug(),
+                document.workspaceSlug(),
                 document.filename(),
                 document.status(),
                 chunks.size(),
                 embeddingProvider.providerName());
     }
 
-    public List<DocumentSummaryResponse> findAll() {
-        return documentRepository.findAll().stream()
+    public List<DocumentSummaryResponse> findAll(TenantContext tenantContext) {
+        return documentRepository.findAll(tenantContext).stream()
                 .map(document -> new DocumentSummaryResponse(
                         document.id(),
+                        document.tenantSlug(),
+                        document.workspaceSlug(),
                         document.filename(),
                         document.contentType(),
                         document.sourceType(),
@@ -106,11 +112,13 @@ public class DocumentService {
                 .toList();
     }
 
-    public DocumentDetailResponse findById(UUID id) {
-        DocumentRecord document = documentRepository.findById(id)
+    public DocumentDetailResponse findById(TenantContext tenantContext, UUID id) {
+        DocumentRecord document = documentRepository.findById(tenantContext, id)
                 .orElseThrow(() -> new IllegalArgumentException("Documento não encontrado: " + id));
         return new DocumentDetailResponse(
                 document.id(),
+                document.tenantSlug(),
+                document.workspaceSlug(),
                 document.filename(),
                 document.contentType(),
                 document.sourceType(),
@@ -119,9 +127,9 @@ public class DocumentService {
                 document.createdAt());
     }
 
-    public List<DocumentChunkResponse> findChunks(UUID documentId) {
-        findById(documentId);
-        return chunkRepository.findByDocumentId(documentId).stream()
+    public List<DocumentChunkResponse> findChunks(TenantContext tenantContext, UUID documentId) {
+        findById(tenantContext, documentId);
+        return chunkRepository.findByDocumentId(tenantContext, documentId).stream()
                 .map(chunk -> new DocumentChunkResponse(
                         chunk.id(),
                         chunk.documentId(),

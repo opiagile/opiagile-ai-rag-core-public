@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public record DocumentDetailResponse(
         UUID id,
+        String tenantId,
+        String workspaceId,
         String filename,
         String contentType,
         String sourceType,

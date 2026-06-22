@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import com.opiagile.supportai.tenant.TenantContext;
+
 @Repository
 public class RagChunkRepository {
 
@@ -17,19 +19,23 @@ public class RagChunkRepository {
         this.jdbc = jdbc;
     }
 
-    public List<StoredChunk> findAllIndexedChunks() {
+    public List<StoredChunk> findAllIndexedChunks(TenantContext tenantContext) {
         return jdbc.sql("""
                 SELECT dc.id AS chunk_id, dc.document_id, d.filename, dc.content
                 FROM document_chunks dc
                 JOIN documents d ON d.id = dc.document_id
                 WHERE d.status = 'INDEXED'
+                  AND d.tenant_id = :tenantId
+                  AND d.workspace_id = :workspaceId
                 ORDER BY d.created_at DESC, dc.chunk_index ASC
                 """)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .query(this::map)
                 .list();
     }
 
-    public List<StoredChunk> findNearestIndexedChunks(float[] embedding, int limit) {
+    public List<StoredChunk> findNearestIndexedChunks(TenantContext tenantContext, float[] embedding, int limit) {
         return jdbc.sql("""
                 SELECT dc.id AS chunk_id,
                        dc.document_id,
@@ -40,9 +46,13 @@ public class RagChunkRepository {
                 JOIN documents d ON d.id = dc.document_id
                 WHERE d.status = 'INDEXED'
                   AND dc.embedding IS NOT NULL
+                  AND d.tenant_id = :tenantId
+                  AND d.workspace_id = :workspaceId
                 ORDER BY dc.embedding <=> CAST(:embedding AS vector)
                 LIMIT :limit
                 """)
+                .param("tenantId", tenantContext.tenantId())
+                .param("workspaceId", tenantContext.workspaceId())
                 .param("embedding", EmbeddingVectorCodec.toPgVector(embedding))
                 .param("limit", Math.max(1, limit))
                 .query(this::mapWithScore)

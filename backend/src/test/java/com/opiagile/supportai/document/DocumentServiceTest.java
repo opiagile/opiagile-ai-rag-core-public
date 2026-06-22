@@ -20,23 +20,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.opiagile.supportai.rag.EmbeddingProvider;
+import com.opiagile.supportai.tenant.TenantContext;
 
 class DocumentServiceTest {
 
     private final DocumentRepository documentRepository = mock(DocumentRepository.class);
     private final DocumentChunkRepository chunkRepository = mock(DocumentChunkRepository.class);
     private final EmbeddingProvider embeddingProvider = mock(EmbeddingProvider.class);
+    private final TenantContext tenantContext = new TenantContext(
+            UUID.randomUUID(),
+            "demo",
+            UUID.randomUUID(),
+            "clinica-demo",
+            "Clínica Demo");
 
     @Test
     void deveRejeitarArquivoMaiorQueLimiteConfigurado() {
         DocumentService service = service(1024, 2000, 10);
         MockMultipartFile file = txt("faq.txt", "a".repeat(1025));
 
-        assertThatThrownBy(() -> service.upload(file))
+        assertThatThrownBy(() -> service.upload(tenantContext, file))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Arquivo muito grande");
 
-        verify(documentRepository, never()).save(anyString(), anyString(), anyString(), any());
+        verify(documentRepository, never()).save(any(TenantContext.class), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -48,7 +55,7 @@ class DocumentServiceTest {
                 "text/plain",
                 new byte[] {(byte) 0xC3, (byte) 0x28});
 
-        assertThatThrownBy(() -> service.upload(file))
+        assertThatThrownBy(() -> service.upload(tenantContext, file))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("UTF-8");
     }
@@ -58,7 +65,7 @@ class DocumentServiceTest {
         DocumentService service = service(1024, 120, 10);
         MockMultipartFile file = txt("faq.txt", "a".repeat(121));
 
-        assertThatThrownBy(() -> service.upload(file))
+        assertThatThrownBy(() -> service.upload(tenantContext, file))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("120 caracteres");
     }
@@ -68,29 +75,32 @@ class DocumentServiceTest {
         DocumentService service = service(4096, 1000, 1);
         MockMultipartFile file = txt("faq.txt", "texto ".repeat(80));
 
-        assertThatThrownBy(() -> service.upload(file))
+        assertThatThrownBy(() -> service.upload(tenantContext, file))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("chunks demais");
     }
 
     @Test
     void deveRejeitarUploadQuandoLimiteDeDocumentosFoiAtingido() {
-        when(documentRepository.countDocuments()).thenReturn(1);
+        when(documentRepository.countDocuments(tenantContext)).thenReturn(1);
         DocumentService service = service(1024, 1000, 10, 1);
 
-        assertThatThrownBy(() -> service.upload(txt("faq.txt", "Conteudo valido para demo.")))
+        assertThatThrownBy(() -> service.upload(tenantContext, txt("faq.txt", "Conteudo valido para demo.")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Limite de documentos da demo atingido");
 
-        verify(documentRepository, never()).save(anyString(), anyString(), anyString(), any());
+        verify(documentRepository, never()).save(any(TenantContext.class), anyString(), anyString(), anyString(), any());
     }
 
     @Test
     void deveSanitizarNomeDoArquivoAntesDePersistir() {
         UUID documentId = UUID.randomUUID();
-        when(documentRepository.save(anyString(), eq("text/plain"), eq("UPLOAD"), eq(DocumentStatus.INDEXED)))
+        when(documentRepository.countDocuments(tenantContext)).thenReturn(0);
+        when(documentRepository.save(eq(tenantContext), anyString(), eq("text/plain"), eq("UPLOAD"), eq(DocumentStatus.INDEXED)))
                 .thenReturn(new DocumentRecord(
                         documentId,
+                        "demo",
+                        "clinica-demo",
                         "FAQ ___2026.txt",
                         "text/plain",
                         "UPLOAD",
@@ -108,12 +118,14 @@ class DocumentServiceTest {
         when(embeddingProvider.providerName()).thenReturn("noop");
 
         DocumentService service = service(1024, 1000, 10);
-        DocumentUploadResponse response = service.upload(txt("../FAQ ç<>2026.txt", "Conteudo valido para demo."));
+        DocumentUploadResponse response = service.upload(tenantContext, txt("../FAQ ç<>2026.txt", "Conteudo valido para demo."));
 
         assertThat(response.documentId()).isEqualTo(documentId);
+        assertThat(response.tenantId()).isEqualTo("demo");
+        assertThat(response.workspaceId()).isEqualTo("clinica-demo");
         assertThat(response.filename()).isEqualTo("FAQ ___2026.txt");
         assertThat(response.chunkCount()).isEqualTo(1);
-        verify(documentRepository).save("FAQ ___2026.txt", "text/plain", "UPLOAD", DocumentStatus.INDEXED);
+        verify(documentRepository).save(tenantContext, "FAQ ___2026.txt", "text/plain", "UPLOAD", DocumentStatus.INDEXED);
     }
 
     private DocumentService service(long maxUploadBytes, int maxUploadChars, int maxUploadChunks) {

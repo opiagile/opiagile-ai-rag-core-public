@@ -101,6 +101,30 @@ GET /api/documents/{id}/chunks
 
 Esses endpoints pertencem ao core. Gateways de canal normalmente não precisam usá-los, exceto em ferramentas internas de administração.
 
+## Tenant E Workspace
+
+Gateways e frontends devem enviar o escopo de conhecimento em todas as chamadas que leem ou escrevem dados de RAG:
+
+```text
+X-Tenant-Id: demo
+X-Workspace-Id: clinica-demo
+```
+
+Sem headers, o core usa o padrão configurado por:
+
+```text
+TENANT_DEFAULT_TENANT=demo
+TENANT_DEFAULT_WORKSPACE=clinica-demo
+```
+
+Workspaces demo disponíveis:
+
+- `clinica-demo`: base de clínica/consultório;
+- `atendimento-demo`: base de atendimento geral e handoff;
+- `locacao-demo`: base de locação imobiliária.
+
+O backend filtra documentos e chunks por tenant/workspace no upload, listagem, busca textual, busca pgvector e chat. Um gateway não deve permitir que o usuário final altere tenant/workspace livremente sem autorização.
+
 ## Canais Recomendados
 
 Valores sugeridos para `channel`:

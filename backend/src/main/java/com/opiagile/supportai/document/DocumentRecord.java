@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public record DocumentRecord(
         UUID id,
+        String tenantSlug,
+        String workspaceSlug,
         String filename,
         String contentType,
         String sourceType,

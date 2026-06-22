@@ -34,6 +34,7 @@ opiagile-whatsapp-ai-gateway
 - Triagem de intenção.
 - Lead e handoff humano.
 - Trace por conversa.
+- Isolamento por tenant/workspace.
 - Deploy Oracle Cloud Always Free via Docker Compose.
 
 Frase técnica correta:
@@ -122,6 +123,7 @@ API_BASE_URL=http://localhost:8080 scripts/e2e-demo.sh
 ```text
 GET  /actuator/health
 GET  /api/version
+GET  /api/workspaces
 POST /api/documents/upload
 GET  /api/documents
 GET  /api/documents/{id}
@@ -136,6 +138,36 @@ GET  /api/observability/conversations/{id}/trace
 ```
 
 Endpoints legados de WhatsApp ainda existem como referência técnica para futura extração, mas não são o foco evolutivo deste core.
+
+## Tenant E Workspace
+
+O RAG isola documentos, conversas e retrieval por tenant/workspace. Use headers nas chamadas de upload, listagem e chat:
+
+```text
+X-Tenant-Id: demo
+X-Workspace-Id: clinica-demo
+```
+
+Se os headers não forem enviados, o padrão é:
+
+```text
+TENANT_DEFAULT_TENANT=demo
+TENANT_DEFAULT_WORKSPACE=clinica-demo
+```
+
+Workspaces demo criados por migration:
+
+| Tenant | Workspace | Uso |
+| --- | --- | --- |
+| `demo` | `clinica-demo` | Clínica ou consultório |
+| `demo` | `atendimento-demo` | Atendimento geral, suporte e handoff |
+| `demo` | `locacao-demo` | Locação imobiliária |
+
+Liste os workspaces disponíveis:
+
+```bash
+curl http://localhost:8080/api/workspaces
+```
 
 ## Upload De Documento
 

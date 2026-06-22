@@ -1,0 +1,21 @@
+# FAQ Atendimento Demo
+
+## Horário de atendimento
+
+O atendimento humano funciona de segunda a sexta, das 9h às 18h.
+
+## Prazo de retorno
+
+Mensagens recebidas dentro do horário comercial costumam receber retorno em até 2 horas úteis.
+
+## Encaminhamento para especialista
+
+Quando a solicitação exige análise técnica, financeira ou comercial detalhada, a conversa deve ser encaminhada para uma pessoa responsável.
+
+## Informações necessárias
+
+Para agilizar o atendimento, informe nome, contato, empresa ou departamento e um resumo objetivo da solicitação.
+
+## Reclamações
+
+Reclamações devem ser tratadas com prioridade e encaminhadas para atendimento humano com resumo da conversa.
