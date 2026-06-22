@@ -145,11 +145,35 @@ Por segurança, a demo limita uploads antes de indexar o conteúdo. Os limites p
 DOCUMENT_UPLOAD_MAX_BYTES=262144
 DOCUMENT_UPLOAD_MAX_CHARS=200000
 DOCUMENT_UPLOAD_MAX_CHUNKS=300
+DOCUMENT_UPLOAD_MAX_DOCUMENTS=50
 SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=256KB
 SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=300KB
 ```
 
 Também são aplicados UTF-8 obrigatório, sanitização de nome de arquivo e rejeição de arquivos que gerem chunks demais.
+
+## Proteção De Demo
+
+O core pode rodar localmente sem autenticação. Para exposição externa de demonstração, configure token e limites no `.env`:
+
+```text
+DEMO_ACCESS_TOKEN=
+DEMO_ADMIN_TOKEN=
+DEMO_RATE_LIMIT_ENABLED=true
+DEMO_CHAT_RATE_LIMIT_PER_MINUTE=30
+DEMO_UPLOAD_RATE_LIMIT_PER_MINUTE=5
+```
+
+Quando `DEMO_ACCESS_TOKEN` estiver preenchido, `POST /api/chat` e `POST /api/documents/upload` exigem `X-Demo-Token` ou `Authorization: Bearer`.
+
+Quando `DEMO_ADMIN_TOKEN` estiver preenchido, o reset protegido fica disponível:
+
+```bash
+curl -X POST http://localhost:8080/api/admin/demo/reset \
+  -H "X-Demo-Admin-Token: TOKEN_ADMIN_LOCAL"
+```
+
+Esse endpoint remove dados de demonstração, conversas, mensagens, handoffs, logs, eventos WhatsApp e documentos. Nunca use token real em commits, prints ou documentação pública.
 
 ```bash
 python3 - <<'PY'

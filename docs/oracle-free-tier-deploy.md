@@ -410,8 +410,33 @@ Limites controlados por `.env` no deploy:
 DOCUMENT_UPLOAD_MAX_BYTES=262144
 DOCUMENT_UPLOAD_MAX_CHARS=200000
 DOCUMENT_UPLOAD_MAX_CHUNKS=300
+DOCUMENT_UPLOAD_MAX_DOCUMENTS=50
 SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=256KB
 SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=300KB
+CADDY_REQUEST_BODY_MAX_SIZE=300KB
+```
+
+Proteção opcional para demo exposta:
+
+```text
+DEMO_ACCESS_TOKEN=
+DEMO_ADMIN_TOKEN=
+DEMO_RATE_LIMIT_ENABLED=true
+DEMO_CHAT_RATE_LIMIT_PER_MINUTE=30
+DEMO_UPLOAD_RATE_LIMIT_PER_MINUTE=5
+```
+
+Se `DEMO_ACCESS_TOKEN` estiver preenchido, chamadas de escrita devem enviar:
+
+```bash
+-H "X-Demo-Token: TOKEN_DEMO_LOCAL"
+```
+
+Reset protegido de dados da demo, apenas quando `DEMO_ADMIN_TOKEN` estiver preenchido:
+
+```bash
+curl -X POST http://136.248.83.176/api/admin/demo/reset \
+  -H "X-Demo-Admin-Token: TOKEN_ADMIN_LOCAL" | jq
 ```
 
 Chat:

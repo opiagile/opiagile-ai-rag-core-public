@@ -26,6 +26,7 @@ public class DocumentService {
     private final long maxUploadBytes;
     private final int maxUploadChars;
     private final int maxUploadChunks;
+    private final int maxDocuments;
 
     public DocumentService(
             DocumentRepository documentRepository,
@@ -34,7 +35,8 @@ public class DocumentService {
             EmbeddingProvider embeddingProvider,
             @Value("${documents.upload.max-bytes:262144}") long maxUploadBytes,
             @Value("${documents.upload.max-chars:200000}") int maxUploadChars,
-            @Value("${documents.upload.max-chunks:300}") int maxUploadChunks) {
+            @Value("${documents.upload.max-chunks:300}") int maxUploadChunks,
+            @Value("${documents.upload.max-documents:50}") int maxDocuments) {
         if (maxUploadBytes < 1024) {
             throw new IllegalArgumentException("documents.upload.max-bytes deve ser maior ou igual a 1024");
         }
@@ -44,6 +46,9 @@ public class DocumentService {
         if (maxUploadChunks < 1) {
             throw new IllegalArgumentException("documents.upload.max-chunks deve ser maior ou igual a 1");
         }
+        if (maxDocuments < 1) {
+            throw new IllegalArgumentException("documents.upload.max-documents deve ser maior ou igual a 1");
+        }
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
         this.chunker = chunker;
@@ -51,11 +56,15 @@ public class DocumentService {
         this.maxUploadBytes = maxUploadBytes;
         this.maxUploadChars = maxUploadChars;
         this.maxUploadChunks = maxUploadChunks;
+        this.maxDocuments = maxDocuments;
     }
 
     @Transactional
     public DocumentUploadResponse upload(MultipartFile file) {
         validateTxt(file);
+        if (documentRepository.countDocuments() >= maxDocuments) {
+            throw new IllegalArgumentException("Limite de documentos da demo atingido. Remova dados de demonstração antes de enviar novo arquivo.");
+        }
         String content = readContent(file);
         List<String> chunks = chunker.chunk(content);
         if (chunks.isEmpty()) {

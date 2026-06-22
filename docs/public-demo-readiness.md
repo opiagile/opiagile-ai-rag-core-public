@@ -71,11 +71,11 @@ Produção real:
 | Backend e banco locais | Concluído |
 | Frontend separado | Pendente |
 | HTTPS público | Pendente |
-| Autenticação/token | Pendente |
-| Rate limit | Parcial: implementado para piloto WhatsApp; pendente para demo pública ampla |
+| Autenticação/token | Concluído de forma opcional via `DEMO_ACCESS_TOKEN` |
+| Rate limit | Concluído para `/api/chat` e upload em memória por IP; piloto WhatsApp também possui limite próprio |
 | Contrato para UI upload/chat/fontes | Concluído em `docs/frontend-handoff.md` |
 | UI pública com HTTPS | Pendente |
-| Reset de dados | Pendente |
+| Reset de dados | Concluído de forma opcional via `DEMO_ADMIN_TOKEN` |
 | Seeds de demonstração | Pendente |
 | Política de retenção | Pendente |
 | Assets finais | Parcial: roteiro e instruções criados, screenshots/GIF/vídeo pendentes |

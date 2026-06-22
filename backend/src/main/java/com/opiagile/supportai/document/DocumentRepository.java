@@ -61,6 +61,13 @@ public class DocumentRepository {
         return count == null ? 0 : count;
     }
 
+    public int countDocuments() {
+        Integer count = jdbc.sql("SELECT count(*) FROM documents")
+                .query(Integer.class)
+                .single();
+        return count == null ? 0 : count;
+    }
+
     private DocumentRecord map(ResultSet rs, int rowNum) throws SQLException {
         return new DocumentRecord(
                 rs.getObject("id", UUID.class),

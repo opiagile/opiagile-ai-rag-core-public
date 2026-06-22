@@ -74,6 +74,18 @@ class DocumentServiceTest {
     }
 
     @Test
+    void deveRejeitarUploadQuandoLimiteDeDocumentosFoiAtingido() {
+        when(documentRepository.countDocuments()).thenReturn(1);
+        DocumentService service = service(1024, 1000, 10, 1);
+
+        assertThatThrownBy(() -> service.upload(txt("faq.txt", "Conteudo valido para demo.")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Limite de documentos da demo atingido");
+
+        verify(documentRepository, never()).save(anyString(), anyString(), anyString(), any());
+    }
+
+    @Test
     void deveSanitizarNomeDoArquivoAntesDePersistir() {
         UUID documentId = UUID.randomUUID();
         when(documentRepository.save(anyString(), eq("text/plain"), eq("UPLOAD"), eq(DocumentStatus.INDEXED)))
@@ -105,6 +117,10 @@ class DocumentServiceTest {
     }
 
     private DocumentService service(long maxUploadBytes, int maxUploadChars, int maxUploadChunks) {
+        return service(maxUploadBytes, maxUploadChars, maxUploadChunks, 50);
+    }
+
+    private DocumentService service(long maxUploadBytes, int maxUploadChars, int maxUploadChunks, int maxDocuments) {
         return new DocumentService(
                 documentRepository,
                 chunkRepository,
@@ -112,7 +128,8 @@ class DocumentServiceTest {
                 embeddingProvider,
                 maxUploadBytes,
                 maxUploadChars,
-                maxUploadChunks);
+                maxUploadChunks,
+                maxDocuments);
     }
 
     private MockMultipartFile txt(String filename, String content) {

@@ -55,9 +55,19 @@ documents:
     max-bytes: ${DOCUMENT_UPLOAD_MAX_BYTES:262144}
     max-chars: ${DOCUMENT_UPLOAD_MAX_CHARS:200000}
     max-chunks: ${DOCUMENT_UPLOAD_MAX_CHUNKS:300}
+    max-documents: ${DOCUMENT_UPLOAD_MAX_DOCUMENTS:50}
   chunk:
     max-chars: ${DOCUMENT_CHUNK_MAX_CHARS:900}
     overlap-chars: ${DOCUMENT_CHUNK_OVERLAP_CHARS:120}
+
+demo:
+  security:
+    access-token: ${DEMO_ACCESS_TOKEN:}
+    admin-token: ${DEMO_ADMIN_TOKEN:}
+    rate-limit:
+      enabled: ${DEMO_RATE_LIMIT_ENABLED:true}
+      chat-per-minute: ${DEMO_CHAT_RATE_LIMIT_PER_MINUTE:30}
+      upload-per-minute: ${DEMO_UPLOAD_RATE_LIMIT_PER_MINUTE:5}
 
 rag:
   top-k: ${RAG_TOP_K:5}

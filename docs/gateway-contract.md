@@ -73,6 +73,8 @@ Uso recomendado pelo gateway:
 - não expor trace bruto ao usuário final;
 - não persistir fontes completas se o canal não precisar;
 - nunca registrar tokens, chaves, app secret ou credenciais do canal.
+- em ambientes de demonstração protegidos, enviar `X-Demo-Token` ou `Authorization: Bearer` nas chamadas de escrita;
+- tratar `429 LIMITE_DEMO_EXCEDIDO` como sinal para reduzir frequência de chamadas.
 
 ## Handoff
 
