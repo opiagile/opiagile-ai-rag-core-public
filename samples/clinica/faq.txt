@@ -1,19 +1,32 @@
-Clinica Opiagile Demonstração - FAQ de Atendimento
+Clinica Opiagile Demonstracao - FAQ de Atendimento
 
 Horario de atendimento:
-A clinica atende de segunda a sexta, das 8h as 18h. Aos sabados, o atendimento ocorre das 8h as 12h, apenas com horario agendado.
+- Segunda a sexta: 8h as 18h.
+- Sabado: 8h as 12h, somente com horario agendado.
+- Domingo e feriados: sem atendimento.
+
+Documentos para consulta:
+- Documento com foto.
+- Carteirinha do convenio, quando houver.
+- Exames recentes, se tiver.
+- Pedido medico, se aplicavel.
+- Se o paciente nao tiver a carteirinha, pode informar o numero do convenio ou apresentar o documento com foto no atendimento.
 
 Agendamento:
-Para agendar uma consulta, o paciente deve informar nome completo, telefone, tipo de consulta desejada e preferencia de data ou periodo.
+- Para solicitar agendamento, coletar: nome completo, telefone, tipo de consulta, modalidade presencial ou online e preferencia de data ou periodo.
+- A IA nao confirma horario real, nao promete vaga e nao deve dizer que o agendamento foi concluido.
+- Quando todos os dados forem coletados, responder de forma objetiva: "Recebi os dados e vou encaminhar para confirmacao da equipe. O retorno sera feito pelo canal informado."
+- Nao pedir a mesma confirmacao varias vezes.
+- Se o paciente disser "sim", "pode seguir", "fico no aguardo", "esta de acordo" ou "nao tenho mais nada", encerrar o fluxo com uma confirmacao curta e nao fazer nova pergunta.
 
 Remarcacao:
-Consultas podem ser remarcadas com pelo menos 24 horas de antecedencia. O paciente deve informar o nome completo e o melhor novo horario.
+- Consultas podem ser remarcadas com pelo menos 24 horas de antecedencia.
+- Para remarcar, coletar nome completo, telefone, data atual da consulta e novo periodo desejado.
 
 Cancelamento:
-Cancelamentos devem ser solicitados com antecedencia minima de 12 horas. Cancelamentos recorrentes podem exigir confirmacao manual da equipe.
-
-Documentos necessarios:
-O paciente deve levar documento com foto, carteirinha do convenio quando houver, exames recentes e pedido medico, se aplicavel.
+- Cancelamentos devem ser solicitados com pelo menos 12 horas de antecedencia.
+- Cancelamentos recorrentes podem exigir confirmacao manual da equipe.
 
 Handoff humano:
-O atendimento deve ser encaminhado para uma pessoa quando o paciente pedir um atendente, relatar uma reclamacao, mencionar urgencia medica ou quando a resposta nao estiver no FAQ.
+- Encaminhar para uma pessoa quando o paciente pedir atendente humano, relatar reclamacao, mencionar urgencia medica, pedir informacao fora do FAQ ou quando a IA nao tiver resposta segura.
+- Em caso de urgencia medica, orientar o paciente a procurar atendimento de emergencia imediatamente.

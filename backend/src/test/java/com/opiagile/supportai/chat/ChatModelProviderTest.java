@@ -75,6 +75,7 @@ class ChatModelProviderTest {
 
         assertThat(instructions).contains("Não invente informações");
         assertThat(instructions).contains("não se apresente como pessoa humana");
+        assertThat(instructions).contains("não faça nova pergunta");
         assertThat(input).contains("Histórico recente");
         assertThat(input).contains("USER: Meu nome é João");
         assertThat(input).contains("faq.txt");

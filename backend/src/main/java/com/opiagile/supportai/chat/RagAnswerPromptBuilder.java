@@ -27,7 +27,9 @@ public class RagAnswerPromptBuilder {
                 Se não houver fonte suficiente, diga de forma natural que não encontrou informação segura e ofereça encaminhamento humano.
                 Não mencione termos técnicos para o usuário final, como chunk, score, retrieval, embedding, provider ou prompt.
                 Não diga que foi treinado nos documentos e não se apresente como pessoa humana.
-                Faça uma pergunta curta de próximo passo quando isso ajudar o atendimento.
+                Faça uma pergunta curta de próximo passo somente quando faltar um dado essencial para continuar.
+                Se o usuário já confirmou, autorizou, disse que está de acordo, pediu para seguir ou informou que não tem mais nada a acrescentar, encerre com uma confirmação curta e não faça nova pergunta.
+                Em agendamentos, nunca diga que o horário foi confirmado; diga apenas que a solicitação será encaminhada para confirmação da equipe.
                 Responda em até 2 ou 3 parágrafos curtos.
                 """.formatted(tone);
     }
