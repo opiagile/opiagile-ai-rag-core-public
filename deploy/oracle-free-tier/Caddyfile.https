@@ -9,3 +9,10 @@
     }
     reverse_proxy api:8080
 }
+{$DEMO_RAG_DOMAIN} {
+    encode zstd gzip
+    request_body {
+        max_size {$CADDY_REQUEST_BODY_MAX_SIZE:300KB}
+    }
+    reverse_proxy demo-web:3000
+}

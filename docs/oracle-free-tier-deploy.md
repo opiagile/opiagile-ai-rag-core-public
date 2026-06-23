@@ -577,3 +577,33 @@ Na VPS, o arquivo `.env` de produção continua manual e não deve ser versionad
 4. Ativar LLM/embeddings com `OPENAI_API_KEY`, se quiser testar RAG real.
 5. Criar branch `develop` e proteger o deploy por GitHub Actions.
 6. Só depois avaliar demo pública com autenticação/rate limit.
+
+## 16. Demo Web Separado
+
+O frontend `opiagile-rag-demo-web` pode rodar na mesma VPS e no mesmo Docker Compose, mas como serviço separado do core.
+
+No Compose, o serviço fica sob o profile `demo`:
+
+```bash
+docker compose --profile demo --env-file deploy/oracle-free-tier/.env -f deploy/oracle-free-tier/docker-compose.yml up -d --build demo-web caddy
+```
+
+O Caddy reconhece o host definido em:
+
+```text
+DEMO_RAG_DOMAIN=demo-rag.opiagile.com
+```
+
+Enquanto o DNS público não for apontado, teste com uma entrada local no arquivo de hosts da máquina de teste:
+
+```text
+136.248.83.176 demo-rag.opiagile.com
+```
+
+Depois acesse:
+
+```text
+http://demo-rag.opiagile.com
+```
+
+Esse formato mantém o `demo-rag` separado da futura landing institucional.
