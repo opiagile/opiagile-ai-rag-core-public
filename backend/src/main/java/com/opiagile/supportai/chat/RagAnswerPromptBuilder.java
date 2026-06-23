@@ -38,6 +38,9 @@ public class RagAnswerPromptBuilder {
 
     public String input(ChatPrompt prompt) {
         return """
+                REGRA OBRIGATÓRIA DE IDIOMA:
+                %s
+
                 Contexto operacional:
                 - Intenção detectada: %s
                 - Status do lead: %s
@@ -54,8 +57,10 @@ public class RagAnswerPromptBuilder {
                 Mensagem atual do usuário:
                 %s
 
+                Antes de responder, confira a regra obrigatória de idioma. A resposta final deve estar somente nesse idioma, mesmo que a mensagem e as fontes estejam em outro idioma.
                 Gere apenas a resposta final para o usuário.
                 """.formatted(
+                languageInstruction(prompt.responseLanguage()),
                 prompt.intent().name(),
                 prompt.leadStatus(),
                 languageInstruction(prompt.responseLanguage()),
