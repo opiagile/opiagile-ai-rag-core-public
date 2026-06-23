@@ -89,10 +89,12 @@ public class ChatService {
         boolean handoffRequired = requiresHuman(intent, sources.isEmpty());
         String fallbackReason = fallbackReason(intent, sources.isEmpty());
         String leadStatus = leadStatus(intent, handoffRequired).name();
+        String responseLanguage = normalizeResponseLanguage(request.responseLanguage());
         ChatGenerationResult generation = chatModelProvider.generate(new ChatPrompt(
                 request.message(),
                 intent,
                 leadStatus,
+                responseLanguage,
                 handoffRequired,
                 fallbackReason,
                 recentMessages,
@@ -151,6 +153,18 @@ public class ChatService {
             return "WEB";
         }
         return channel.trim().toUpperCase();
+    }
+
+    private String normalizeResponseLanguage(String responseLanguage) {
+        if (responseLanguage == null || responseLanguage.isBlank()) {
+            return "PORTUGUESE";
+        }
+        return switch (responseLanguage.trim().toUpperCase()) {
+            case "EN", "ENGLISH" -> "ENGLISH";
+            case "ES", "SPANISH" -> "SPANISH";
+            case "PT", "PORTUGUESE", "PORTUGUES" -> "PORTUGUESE";
+            default -> "PORTUGUESE";
+        };
     }
 
     private boolean requiresHuman(Intent intent, boolean withoutSources) {

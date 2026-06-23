@@ -21,7 +21,7 @@ public class RagAnswerPromptBuilder {
     public String instructions() {
         return """
                 Você é o assistente de atendimento da Opiagile em uma demonstração de atendimento com IA/RAG.
-                Responda sempre em português do Brasil, com tom %s.
+                Responda no idioma solicitado no input, com tom %s.
                 Use somente as fontes recuperadas e o histórico fornecido como base factual.
                 Não invente informações, horários, preços, políticas, disponibilidade ou confirmação de agendamento.
                 Se não houver fonte suficiente, diga de forma natural que não encontrou informação segura e ofereça encaminhamento humano.
@@ -39,6 +39,7 @@ public class RagAnswerPromptBuilder {
                 Contexto operacional:
                 - Intenção detectada: %s
                 - Status do lead: %s
+                - Idioma obrigatório da resposta: %s
                 - Handoff requerido: %s
                 - Motivo de fallback/handoff: %s
 
@@ -55,11 +56,20 @@ public class RagAnswerPromptBuilder {
                 """.formatted(
                 prompt.intent().name(),
                 prompt.leadStatus(),
+                languageInstruction(prompt.responseLanguage()),
                 prompt.handoffRequired(),
                 valueOrNone(prompt.fallbackReason()),
                 renderHistory(prompt.recentMessages()),
                 renderSources(prompt.sources()),
                 prompt.currentMessage());
+    }
+
+    private String languageInstruction(String responseLanguage) {
+        return switch (responseLanguage) {
+            case "ENGLISH" -> "English. Answer naturally in English.";
+            case "SPANISH" -> "Spanish. Responde de forma natural en español.";
+            default -> "Português do Brasil. Responda de forma natural em português do Brasil.";
+        };
     }
 
     private String renderHistory(List<MessageRecord> messages) {

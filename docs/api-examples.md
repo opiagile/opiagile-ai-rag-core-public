@@ -40,9 +40,12 @@ PY
 {
   "message": "Vocês atendem aos sábados?",
   "channel": "WEB",
-  "contactId": "demo"
+  "contactId": "demo",
+  "responseLanguage": "PORTUGUESE"
 }
 ```
+
+`responseLanguage` é opcional e aceita `ENGLISH`, `SPANISH` ou `PORTUGUESE`. Use esse campo para forçar a resposta da LLM/fallback no mesmo idioma selecionado pela interface.
 
 ## Webhook WhatsApp
 

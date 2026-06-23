@@ -86,7 +86,8 @@ public class WhatsAppMetaWebhookService {
                         null,
                         messageWithName(event),
                         "WHATSAPP",
-                        PhoneNumberMasker.normalize(event.from())));
+                        PhoneNumberMasker.normalize(event.from()),
+                        null));
         WhatsAppSendResult sendResult = outboundService.send(event.from(), chatResponse.answer());
         eventRepository.save(provider(), event.messageId(), chatResponse.conversationId(), maskedPhone, event.eventType(), true,
                 sendResult.blockedReason(), properties.isDryRun(), properties.isSendEnabled(), sendResult.status());

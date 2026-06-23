@@ -54,7 +54,8 @@ public class WhatsappWebhookController {
                         null,
                         messageWithName(request),
                         "WHATSAPP",
-                        request.from()));
+                        request.from(),
+                        null));
         whatsAppProvider.sendMessage(request.from(), chatResponse.answer());
         return new WhatsappWebhookResponse(
                 whatsAppProvider.providerName(),

@@ -240,7 +240,8 @@ import urllib.request
 payload = json.dumps({
     "message": "Vocês atendem aos sábados?",
     "channel": "WEB",
-    "contactId": "teste-local"
+    "contactId": "teste-local",
+    "responseLanguage": "PORTUGUESE"
 }).encode()
 
 request = urllib.request.Request(

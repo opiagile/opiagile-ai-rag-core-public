@@ -27,9 +27,18 @@ Payload:
   "conversationId": "opcional",
   "message": "string",
   "channel": "WHATSAPP",
-  "contactId": "5511999999999"
+  "contactId": "5511999999999",
+  "responseLanguage": "PORTUGUESE"
 }
 ```
+
+`responseLanguage` é opcional. Valores aceitos:
+
+- `ENGLISH`
+- `SPANISH`
+- `PORTUGUESE`
+
+Quando omitido, o core usa `PORTUGUESE` para manter compatibilidade com gateways existentes. Frontends internacionais devem enviar esse campo de acordo com o idioma selecionado pelo usuário.
 
 Resposta:
 

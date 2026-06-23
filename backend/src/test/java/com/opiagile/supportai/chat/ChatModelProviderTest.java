@@ -90,6 +90,7 @@ class ChatModelProviderTest {
                 "Vocês atendem aos sábados?",
                 Intent.DUVIDA_FAQ,
                 "QUALIFYING",
+                "PORTUGUESE",
                 false,
                 null,
                 List.of(new MessageRecord(

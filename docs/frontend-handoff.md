@@ -146,9 +146,20 @@ Payload:
   "conversationId": "opcional",
   "message": "Vocês atendem aos sábados?",
   "channel": "WEB",
-  "contactId": "demo-web"
+  "contactId": "demo-web",
+  "responseLanguage": "PORTUGUESE"
 }
 ```
+
+Para interfaces multilíngues, enviar `responseLanguage` conforme o idioma selecionado:
+
+| Idioma da UI | Valor enviado |
+| --- | --- |
+| Inglês | `ENGLISH` |
+| Espanhol | `SPANISH` |
+| Português | `PORTUGUESE` |
+
+Se o campo for omitido, o core responde em português por compatibilidade.
 
 Resposta esperada:
 

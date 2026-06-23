@@ -16,7 +16,7 @@ class ChatRequestValidationTest {
 
     @Test
     void deveExigirMensagem() {
-        Set<ConstraintViolation<ChatRequest>> violations = validator.validate(new ChatRequest(null, "", "WEB", "demo"));
+        Set<ConstraintViolation<ChatRequest>> violations = validator.validate(new ChatRequest(null, "", "WEB", "demo", null));
 
         assertThat(violations)
                 .extracting(ConstraintViolation::getMessage)
@@ -25,7 +25,7 @@ class ChatRequestValidationTest {
 
     @Test
     void deveLimitarTamanhoDaMensagem() {
-        Set<ConstraintViolation<ChatRequest>> violations = validator.validate(new ChatRequest(null, "a".repeat(1201), "WEB", "demo"));
+        Set<ConstraintViolation<ChatRequest>> violations = validator.validate(new ChatRequest(null, "a".repeat(1201), "WEB", "demo", null));
 
         assertThat(violations)
                 .extracting(ConstraintViolation::getMessage)
@@ -38,12 +38,27 @@ class ChatRequestValidationTest {
                 null,
                 "Olá",
                 "W".repeat(33),
-                "c".repeat(129)));
+                "c".repeat(129),
+                null));
 
         assertThat(violations)
                 .extracting(ConstraintViolation::getMessage)
                 .contains(
                         "O canal deve ter no máximo 32 caracteres.",
                         "O identificador de contato deve ter no máximo 128 caracteres.");
+    }
+
+    @Test
+    void deveValidarIdiomaDaRespostaQuandoInformado() {
+        Set<ConstraintViolation<ChatRequest>> violations = validator.validate(new ChatRequest(
+                null,
+                "Olá",
+                "WEB",
+                "demo",
+                "FR"));
+
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("O idioma da resposta deve ser ENGLISH, SPANISH ou PORTUGUESE.");
     }
 }

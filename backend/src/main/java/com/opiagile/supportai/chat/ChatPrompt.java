@@ -10,6 +10,7 @@ public record ChatPrompt(
         String currentMessage,
         Intent intent,
         String leadStatus,
+        String responseLanguage,
         boolean handoffRequired,
         String fallbackReason,
         List<MessageRecord> recentMessages,
