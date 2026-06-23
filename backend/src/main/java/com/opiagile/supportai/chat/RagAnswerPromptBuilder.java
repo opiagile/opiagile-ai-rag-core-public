@@ -73,7 +73,7 @@ public class RagAnswerPromptBuilder {
 
     private String languageInstruction(String responseLanguage) {
         return switch (responseLanguage) {
-            case "ENGLISH" -> "ENGLISH. The final answer must be entirely in English.";
+            case "ENGLISH" -> "ENGLISH ONLY. The final answer must be entirely in English. Do not use Portuguese or Spanish words. Translate terms such as 'Entendido', 'atendente humano', 'segunda a sexta' and 'horas úteis' into natural English.";
             case "SPANISH" -> "SPANISH. La respuesta final debe estar completamente en español.";
             default -> "PORTUGUESE. A resposta final deve estar completamente em português do Brasil.";
         };
