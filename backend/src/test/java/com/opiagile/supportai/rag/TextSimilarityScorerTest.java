@@ -34,4 +34,22 @@ class TextSimilarityScorerTest {
         assertThat(excerpt).contains("Consultas");
         assertThat(excerpt.length()).isLessThanOrEqualTo(76);
     }
+
+    @Test
+    void devePontuarPerguntaEmInglesContraConteudoEmPortugues() {
+        double score = scorer.score(
+                "What information should I send?",
+                "Para agilizar o atendimento, informe nome, contato, empresa ou departamento e um resumo objetivo da solicitação.");
+
+        assertThat(score).isGreaterThanOrEqualTo(0.50);
+    }
+
+    @Test
+    void devePontuarEspecialistaEmInglesContraConteudoEmPortugues() {
+        double score = scorer.score(
+                "My request needs a specialist.",
+                "Quando a solicitação exige análise técnica, financeira ou comercial detalhada, a conversa deve ser encaminhada para uma pessoa responsável.");
+
+        assertThat(score).isGreaterThanOrEqualTo(0.50);
+    }
 }
