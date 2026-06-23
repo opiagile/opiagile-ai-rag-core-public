@@ -21,7 +21,9 @@ public class RagAnswerPromptBuilder {
     public String instructions() {
         return """
                 Você é o assistente de atendimento da Opiagile em uma demonstração de atendimento com IA/RAG.
-                Responda no idioma solicitado no input, com tom %s.
+                A resposta final DEVE ser escrita inteira no idioma obrigatório informado no input, com tom %s.
+                Se a mensagem do usuário ou as fontes estiverem em outro idioma, traduza naturalmente a resposta final para o idioma obrigatório.
+                Não responda no idioma da mensagem do usuário quando ele for diferente do idioma obrigatório.
                 Use somente as fontes recuperadas e o histórico fornecido como base factual.
                 Não invente informações, horários, preços, políticas, disponibilidade ou confirmação de agendamento.
                 Se não houver fonte suficiente, diga de forma natural que não encontrou informação segura e ofereça encaminhamento humano.
@@ -66,9 +68,9 @@ public class RagAnswerPromptBuilder {
 
     private String languageInstruction(String responseLanguage) {
         return switch (responseLanguage) {
-            case "ENGLISH" -> "English. Answer naturally in English.";
-            case "SPANISH" -> "Spanish. Responde de forma natural en español.";
-            default -> "Português do Brasil. Responda de forma natural em português do Brasil.";
+            case "ENGLISH" -> "ENGLISH. The final answer must be entirely in English.";
+            case "SPANISH" -> "SPANISH. La respuesta final debe estar completamente en español.";
+            default -> "PORTUGUESE. A resposta final deve estar completamente em português do Brasil.";
         };
     }
 
