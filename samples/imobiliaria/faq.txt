@@ -1,16 +1,56 @@
-Imobiliaria Opiagile Demonstração - FAQ de Atendimento
+Imobiliaria Opiagile Demonstracao - FAQ de Atendimento
+
+Objetivo do workspace:
+Este arquivo simula atendimento de locacao imobiliaria. Use dados ficticios. A IA deve apoiar triagem comercial, documentos, visitas e encaminhamento para corretor, sem confirmar disponibilidade real de imovel ou condicoes contratuais nao documentadas.
 
 Horario de atendimento:
-A imobiliaria atende de segunda a sexta, das 9h as 18h, e aos sabados das 9h as 13h para visitas agendadas.
+- Segunda a sexta: 9h as 18h.
+- Sabados: 9h as 13h para visitas agendadas.
+- Domingos e feriados: sem atendimento comercial regular.
 
 Interesse em imovel:
-Para qualificar o atendimento, informe se deseja comprar, alugar ou anunciar um imovel, alem de cidade, bairro, faixa de preco e quantidade de quartos.
+Para qualificar o atendimento, coletar:
+- Se deseja alugar, comprar ou anunciar.
+- Cidade e bairro de interesse.
+- Faixa de preco.
+- Quantidade de quartos.
+- Necessidade de vaga.
+- Data desejada para mudanca.
+- Melhor canal de contato.
 
 Agendamento de visita:
-Visitas devem ser agendadas com pelo menos 24 horas de antecedencia. E necessario informar nome, telefone, imovel de interesse e melhor horario.
+- Visitas devem ser agendadas com pelo menos 24 horas de antecedencia.
+- Para agendar visita, coletar nome, telefone, imovel de interesse e melhor data ou periodo.
+- A IA nao confirma visita real, porque a disponibilidade depende do corretor, do proprietario e da agenda do imovel.
+- A resposta correta e: "Recebi as informacoes e vou encaminhar para a equipe confirmar a disponibilidade da visita."
 
 Documentos para locacao:
-O processo de locacao pode solicitar documento com foto, comprovante de renda, comprovante de residencia e analise cadastral.
+- Documento com foto.
+- Comprovante de renda.
+- Comprovante de residencia.
+- Ficha cadastral preenchida.
+- Dados para analise de credito.
+- Fiador, seguro fianca ou caucao podem ser solicitados conforme regra do imovel e resultado da analise cadastral.
+
+Analise cadastral:
+- A analise cadastral avalia renda, documentacao, historico e garantias.
+- A IA nao aprova cadastro, nao nega cadastro e nao informa score.
+- Duvidas sobre reprovas, valores, garantias ou excecoes devem ser encaminhadas para humano.
+
+Cancelamento, rescisao e contrato:
+- Pedido de cancelamento, rescisao ou encerramento de contrato deve ser encaminhado para humano.
+- A equipe valida prazo contratual, multa, vistoria, entrega de chaves, encargos pendentes e regras previstas no contrato de locacao.
 
 Handoff humano:
-Encaminhe para humano quando houver proposta de compra, negociacao de valor, reclamacao, urgencia contratual ou pedido explicito por corretor.
+- Encaminhar para humano quando houver proposta de compra, negociacao de valor, reclamacao, urgencia contratual, pedido de cancelamento, duvida juridica ou pedido explicito por corretor.
+
+English quick answers:
+- For rental, the applicant may need a photo ID, proof of income, proof of address, completed registration form and credit analysis data.
+- Property visits must be scheduled at least 24 hours in advance.
+- To schedule a visit, collect name, phone, property of interest and preferred date or period.
+- Cancellation or contract termination must be routed to a human broker or analyst.
+
+Respuestas rapidas en espanol:
+- Para alquilar un inmueble, pueden solicitarse documento con foto, comprobante de ingresos, comprobante de residencia, ficha de registro y datos para analisis de credito.
+- Las visitas deben agendarse con al menos 24 horas de anticipacion.
+- Cancelacion o rescision contractual debe ser encaminada a una persona.

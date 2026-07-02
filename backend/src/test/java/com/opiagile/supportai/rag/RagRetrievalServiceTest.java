@@ -85,12 +85,32 @@ class RagRetrievalServiceTest {
         assertThat(chunks.getFirst().retrievalProvider()).isEqualTo("local-text");
     }
 
+    @Test
+    void devePriorizarChunkNoIdiomaDaRespostaQuandoHouverEmpateTextual() {
+        when(embeddingProvider.embed("Opiagile empresa")).thenReturn(Optional.empty());
+        when(chunkRepository.findAllIndexedChunks(tenantContext)).thenReturn(List.of(
+                chunk("A Opiagile ajuda empresas com conhecimento e atendimento.", "pt", null),
+                chunk("Opiagile ayuda a las empresas con conocimiento y atención.", "es", null)));
+
+        RagRetrievalService service = new RagRetrievalService(chunkRepository, scorer, embeddingProvider, 5, 0.15);
+
+        List<RetrievedChunk> chunks = service.retrieve(tenantContext, "Opiagile empresa", "SPANISH");
+
+        assertThat(chunks).isNotEmpty();
+        assertThat(chunks.getFirst().excerpt()).contains("ayuda");
+    }
+
     private StoredChunk chunk(String content, Double score) {
+        return chunk(content, null, score);
+    }
+
+    private StoredChunk chunk(String content, String language, Double score) {
         return new StoredChunk(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 "faq.txt",
                 content,
+                language,
                 score);
     }
 }

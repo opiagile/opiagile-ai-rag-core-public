@@ -1,16 +1,20 @@
 Clinica Opiagile Demonstracao - FAQ de Atendimento
 
+Objetivo do workspace:
+Este arquivo simula a base de conhecimento de uma clinica ou consultorio. Use dados ficticios. A IA deve responder somente com base nas regras abaixo, citar fontes quando o core retornar fontes e encaminhar para humano quando faltar informacao segura.
+
 Horario de atendimento:
 - Segunda a sexta: 8h as 18h.
 - Sabado: 8h as 12h, somente com horario agendado.
 - Domingo e feriados: sem atendimento.
+- Perguntas como "Do you open on Saturdays?", "abrem aos sabados?" e "atienden los sabados?" devem responder que sim, mas apenas das 8h as 12h e com horario agendado.
 
 Documentos para consulta:
 - Documento com foto.
 - Carteirinha do convenio, quando houver.
 - Exames recentes, se tiver.
 - Pedido medico, se aplicavel.
-- Se o paciente nao tiver a carteirinha, pode informar o numero do convenio ou apresentar o documento com foto no atendimento.
+- Se o paciente nao tiver a carteirinha, pode informar o numero do convenio ou apresentar documento com foto no atendimento.
 
 Agendamento:
 - Para solicitar agendamento, coletar: nome completo, telefone, tipo de consulta, modalidade presencial ou online e preferencia de data ou periodo.
@@ -30,3 +34,16 @@ Cancelamento:
 Handoff humano:
 - Encaminhar para uma pessoa quando o paciente pedir atendente humano, relatar reclamacao, mencionar urgencia medica, pedir informacao fora do FAQ ou quando a IA nao tiver resposta segura.
 - Em caso de urgencia medica, orientar o paciente a procurar atendimento de emergencia imediatamente.
+
+English quick answers:
+- The clinic opens Monday to Friday from 8 AM to 6 PM.
+- On Saturdays, it opens from 8 AM to noon by appointment only.
+- For an appointment, collect full name, phone, consultation type, in-person or online preference, and preferred date or period.
+- The assistant must not confirm a real time slot without the clinic team.
+- The patient should bring a photo ID, insurance card when available, recent exams and a medical request when applicable.
+
+Respuestas rapidas en espanol:
+- La clinica atiende de lunes a viernes de 8 a 18 horas.
+- Los sabados atiende de 8 a 12 solo con cita agendada.
+- Para una cita, solicitar nombre completo, telefono, tipo de consulta, modalidad presencial u online y fecha o periodo preferido.
+- El asistente no debe confirmar un horario real sin validacion del equipo.

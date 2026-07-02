@@ -236,6 +236,39 @@ Entregáveis:
 - Contrato HTTP para gateways externos.
 - Documentação alinhada ao futuro `opiagile-whatsapp-ai-gateway`.
 
+## Sprint v0.13 - Resiliência De Provedores IA
+
+Status: concluída.
+
+Objetivo: reduzir dependência operacional de um único provider sem tentar contornar restrições externas. A sprint deve expor status seguro de providers, documentar fallback, preservar modo DEMO e preparar o core para providers alternativos.
+
+Entregáveis:
+
+- Status seguro de LLM, embeddings e fallback.
+- Configuração documentada de provider principal e fallback.
+- Testes de comportamento quando provider real falha ou está ausente.
+- Relatório de continuidade operacional.
+
+## Sprint v0.14 - Code Review Spring AI E Ecossistema Spring
+
+Status: análise registrada em `docs/v0.14-spring-ai-code-review.md` e POC inicial de embeddings concluída em `docs/v0.14-spring-ai-poc-report.md`.
+
+Objetivo: revisar o código para identificar onde o projeto deve usar Spring AI ou bibliotecas Spring em vez de manter integrações manuais.
+
+Achados principais:
+
+- O projeto usa bem Spring Boot, Spring Web, Validation, JDBC, Flyway, Actuator, Mail, Scheduler e springdoc.
+- O projeto ainda não usa Spring AI diretamente para chat, embeddings, vector store, advisors ou tool calling.
+- `OpenAiChatModelProvider`, `OpenAiEmbeddingProvider` e `OpenAiToolPlanProvider` usam `RestClient` manual.
+- O uso manual de pgvector pode ser aceitável por causa de tenant/workspace e auditoria, mas deve ser reavaliado contra `PgVectorStore`.
+
+Entregáveis recomendados:
+
+- Prova de conceito com `SpringAiEmbeddingProvider`: concluída.
+- Prova de conceito com `SpringAiChatModelProvider`: pendente.
+- Comparação manual versus Spring AI para qualidade, latência, tokens, fallback e manutenção.
+- Decisão registrada sobre manter ou migrar pgvector, prompt/advisors e tool calling.
+
 Pendências mantidas:
 
 - Avaliação RAG automatizada.

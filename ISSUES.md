@@ -1,5 +1,33 @@
 # Lista De Tarefas
 
+## Lembrete Visível — Email De Solicitações Developer
+
+- [ ] Retomar envio automático de email das solicitações de API key sandbox.
+
+Contexto: o formulário `/developers` já salva as solicitações no banco e a fila assíncrona já existe. O envio ficou temporariamente desabilitado na VPS porque o Microsoft 365 recusou autenticação SMTP com `MailAuthenticationException`.
+
+Próximas opções:
+
+- habilitar SMTP AUTH/app password na conta correta do Microsoft 365; ou
+- trocar o envio para Microsoft Graph API com credenciais seguras; ou
+- usar provedor transacional dedicado para emails operacionais.
+
+Critério para concluir: `DEVELOPER_ACCESS_EMAIL_ENABLED=true`, envio validado sem bloquear o lead, `notification_email_sent=true` após sucesso e retries preservados em caso de falha.
+
+## Lembrete Visível — v0.14 Spring AI
+
+- [x] Registrar code review v0.14 de Spring AI.
+- [x] Implementar POC inicial `SpringAiEmbeddingProvider`.
+- [ ] Avaliar `SpringAiChatModelProvider`.
+- [ ] Comparar provider manual versus Spring AI com dataset RAG.
+- [ ] Decidir sobre `PgVectorStore`, advisors e tool calling.
+
+Contexto: o relatório [`docs/v0.14-spring-ai-code-review.md`](docs/v0.14-spring-ai-code-review.md) confirma que o core usa bem Spring Boot, Spring Web, Validation, JDBC, Flyway, Actuator, Mail, Scheduler e springdoc, mas ainda não usa Spring AI diretamente para chat, embeddings, vector store, advisors ou tool calling.
+
+Próxima decisão técnica: antes de adicionar novas capacidades de IA, avaliar se `OpenAiChatModelProvider`, `OpenAiEmbeddingProvider`, prompt/advisors, pgvector e tool calling devem migrar parcialmente para Spring AI ou permanecer manuais por necessidade de controle.
+
+Critério para concluir totalmente a trilha Spring AI: prova de conceito de chat validada, decisão registrada, testes passando e contrato público preservado.
+
 ## Fundação
 
 - [x] Criar arquivos de fundação do repositório.
@@ -69,6 +97,9 @@
 
 ## Próxima Fase Recomendada
 
+- [x] v0.13 — Resiliência de provedores IA.
+- [x] v0.14 — Code review e POC inicial com Spring AI para embeddings.
+- [ ] v0.14.x — Avaliação de chat, advisors, PgVectorStore e tool calling com Spring AI.
 - [ ] Avaliação RAG automatizada com dataset de perguntas, respostas e fontes esperadas.
 
 Descrição: criar um conjunto versionado de perguntas por nicho, respostas esperadas, fontes esperadas e pontuação automática/semi-automática para medir qualidade de recuperação textual, recuperação pgvector e resposta final com LLM.

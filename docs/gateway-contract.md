@@ -13,6 +13,42 @@ O objetivo é manter este repositório focado em RAG, fontes, memória, resposta
 - Segredos do canal ficam no gateway.
 - Segredos de LLM e embeddings ficam no core.
 - Dados sensíveis devem ser minimizados antes de atravessar o contrato.
+- O gateway deve autenticar no core com API key tenant-aware, não com headers livres de tenant/workspace em ambientes expostos.
+
+## Autenticação Do Gateway
+
+Gateways devem enviar a chave no header:
+
+```text
+X-OPIAGILE-API-KEY: <api-key-do-gateway>
+```
+
+Também é aceito:
+
+```text
+Authorization: Bearer <api-key-do-gateway>
+```
+
+A chave real nunca é armazenada em texto puro no banco. A tabela `api_clients` guarda apenas `key_hash` com SHA-256, `key_prefix` para identificação operacional, tenant/workspace vinculado, status, escopos e rate limit.
+
+Em ambiente publicado, configure:
+
+```text
+API_SECURITY_ENABLED=true
+API_SECURITY_REQUIRE_API_KEY=true
+```
+
+O modo legado com `X-Tenant-Id` e `X-Workspace-Id` deve ficar restrito a desenvolvimento local ou migração controlada.
+
+Escopos recomendados por tipo de gateway:
+
+| Gateway | Escopos mínimos |
+| --- | --- |
+| Webchat público | `chat:write` |
+| Painel de documentos | `documents:read`, `documents:upload` |
+| Painel operacional | `conversations:read`, `observability:read`, `handoffs:read`, `handoffs:write` |
+| Ferramentas internas | `tools:read`, `tools:execute` |
+| Seletor de workspace | `workspaces:read` |
 
 ## Endpoint Principal
 
@@ -112,7 +148,7 @@ Esses endpoints pertencem ao core. Gateways de canal normalmente não precisam u
 
 ## Tenant E Workspace
 
-Gateways e frontends devem enviar o escopo de conhecimento em todas as chamadas que leem ou escrevem dados de RAG:
+Em ambiente local ou legado, gateways e frontends podem enviar o escopo de conhecimento em chamadas que leem ou escrevem dados de RAG:
 
 ```text
 X-Tenant-Id: demo
@@ -133,6 +169,8 @@ Workspaces demo disponíveis:
 - `locacao-demo`: base de locação imobiliária.
 
 O backend filtra documentos e chunks por tenant/workspace no upload, listagem, busca textual, busca pgvector e chat. Um gateway não deve permitir que o usuário final altere tenant/workspace livremente sem autorização.
+
+Com API key tenant-aware, o core ignora esses headers e usa o tenant/workspace vinculado à credencial. Esse é o modelo recomendado para separar clientes, departamentos ou aplicações.
 
 ## Canais Recomendados
 

@@ -7,7 +7,7 @@ Este guia não assume acesso SSH por agente. Todos os comandos abaixo são para 
 ## Dados Da VPS
 
 ```text
-IP público: 136.248.83.176
+IP público: <IP_PUBLICO_DA_VPS>
 Usuário SSH: ubuntu
 Sistema: Ubuntu 24.04 ARM / aarch64
 Shape: Oracle VM.Standard.A1.Flex
@@ -15,13 +15,13 @@ CPU: 2 OCPUs
 RAM: 12 GB
 Disco: 200 GB
 Arquitetura: ARM64
-Chave SSH local: ~/.ssh/opiagile_oracle_cloud
+Chave SSH local: ~/.ssh/sua_chave_oracle
 ```
 
 Acesso:
 
 ```bash
-ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
+ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
 ```
 
 ## 1. Checklist De Pré-Requisitos
@@ -31,7 +31,7 @@ Antes de iniciar:
 - A VPS precisa estar acessível por SSH.
 - A regra de entrada da Oracle Cloud precisa permitir TCP `22`.
 - Para web/HTTPS, a Security List ou NSG da Oracle também deve permitir TCP `80` e `443`.
-- Se for usar HTTPS automático, o domínio ou subdomínio deve apontar para `136.248.83.176`.
+- Se for usar HTTPS automático, o domínio ou subdomínio deve apontar para `<IP_PUBLICO_DA_VPS>`.
 - Não exponha PostgreSQL na internet.
 - Não rode LLM pesado local na VPS. Use APIs externas para LLM e embeddings.
 - Tenha uma chave OpenAI somente se quiser ativar LLM/embeddings reais.
@@ -56,7 +56,7 @@ sudo reboot
 Reconecte após o reboot:
 
 ```bash
-ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
+ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
 ```
 
 Confirme arquitetura:
@@ -113,7 +113,7 @@ Saia e reconecte:
 
 ```bash
 exit
-ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
+ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
 ```
 
 Valide:
@@ -230,7 +230,7 @@ Não instale Redis agora. Isso reduz consumo de RAM, superfície de ataque e man
 
 O deploy usa Caddy por simplicidade:
 
-- sem domínio: HTTP em `http://136.248.83.176`;
+- sem domínio: HTTP em `http://<IP_PUBLICO_DA_VPS>`;
 - com domínio: HTTPS automático com Let's Encrypt.
 
 ### Sem Domínio
@@ -248,13 +248,13 @@ ACME_EMAIL=
 Antes, aponte um registro DNS `A` para:
 
 ```text
-136.248.83.176
+<IP_PUBLICO_DA_VPS>
 ```
 
 Exemplo:
 
 ```text
-rag.opiagile.com.br -> 136.248.83.176
+rag.opiagile.com.br -> <IP_PUBLICO_DA_VPS>
 ```
 
 No `.env`:
@@ -378,20 +378,20 @@ Health:
 
 ```bash
 curl -i http://localhost:8080/actuator/health
-curl -i http://136.248.83.176/actuator/health
+curl -i http://<IP_PUBLICO_DA_VPS>/actuator/health
 ```
 
 Versão:
 
 ```bash
-curl -s http://136.248.83.176/api/version | jq
+curl -s http://<IP_PUBLICO_DA_VPS>/api/version | jq
 ```
 
 Upload de documento:
 
 ```bash
 cd /opt/opiagile/opiagile-ai-rag-core
-curl -F "file=@samples/clinica/faq.txt" http://136.248.83.176/api/documents/upload | jq
+curl -F "file=@samples/clinica/faq.txt" http://<IP_PUBLICO_DA_VPS>/api/documents/upload | jq
 ```
 
 Upload acima do limite da demo deve retornar erro controlado:
@@ -401,7 +401,7 @@ python3 - <<'PY'
 from pathlib import Path
 Path('/tmp/rag-arquivo-grande.txt').write_text('a' * 270000)
 PY
-curl -i -F "file=@/tmp/rag-arquivo-grande.txt" http://136.248.83.176/api/documents/upload
+curl -i -F "file=@/tmp/rag-arquivo-grande.txt" http://<IP_PUBLICO_DA_VPS>/api/documents/upload
 ```
 
 Limites controlados por `.env` no deploy:
@@ -435,14 +435,14 @@ Se `DEMO_ACCESS_TOKEN` estiver preenchido, chamadas de escrita devem enviar:
 Reset protegido de dados da demo, apenas quando `DEMO_ADMIN_TOKEN` estiver preenchido:
 
 ```bash
-curl -X POST http://136.248.83.176/api/admin/demo/reset \
+curl -X POST http://<IP_PUBLICO_DA_VPS>/api/admin/demo/reset \
   -H "X-Demo-Admin-Token: TOKEN_ADMIN_LOCAL" | jq
 ```
 
 Chat:
 
 ```bash
-curl -s http://136.248.83.176/api/chat \
+curl -s http://<IP_PUBLICO_DA_VPS>/api/chat \
   -H "Content-Type: application/json" \
   -H "X-Tenant-Id: demo" \
   -H "X-Workspace-Id: clinica-demo" \
@@ -474,7 +474,7 @@ Correção:
 ```bash
 sudo usermod -aG docker ubuntu
 exit
-ssh -i ~/.ssh/opiagile_oracle_cloud ubuntu@136.248.83.176
+ssh -i ~/.ssh/sua_chave_oracle ubuntu@<IP_PUBLICO_DA_VPS>
 ```
 
 ### API não sobe
@@ -512,7 +512,7 @@ docker compose --env-file .env logs --tail=200 caddy
 
 Confirme:
 
-- domínio aponta para `136.248.83.176`;
+- domínio aponta para `<IP_PUBLICO_DA_VPS>`;
 - portas `80` e `443` liberadas no UFW;
 - portas `80` e `443` liberadas na Oracle Cloud;
 - `CADDYFILE_PATH=./Caddyfile.https`;
@@ -554,7 +554,7 @@ Ele só faz deploy quando:
 Secrets sugeridos:
 
 ```text
-ORACLE_HOST=136.248.83.176
+ORACLE_HOST=<IP_PUBLICO_DA_VPS>
 ORACLE_USER=ubuntu
 ORACLE_SSH_KEY=<conteúdo da chave privada de deploy>
 ORACLE_SSH_PORT=22
@@ -575,7 +575,7 @@ Na VPS, o arquivo `.env` de produção continua manual e não deve ser versionad
 2. Validar upload e chat em modo DEMO.
 3. Ativar domínio e HTTPS.
 4. Ativar LLM/embeddings com `OPENAI_API_KEY`, se quiser testar RAG real.
-5. Criar branch `develop` e proteger o deploy por GitHub Actions.
+5. Manter a branch `develop` protegida para deploy por GitHub Actions.
 6. Só depois avaliar demo pública com autenticação/rate limit.
 
 ## 16. Demo Web Separado
@@ -597,7 +597,7 @@ DEMO_RAG_DOMAIN=demo-rag.opiagile.com
 Enquanto o DNS público não for apontado, teste com uma entrada local no arquivo de hosts da máquina de teste:
 
 ```text
-136.248.83.176 demo-rag.opiagile.com
+<IP_PUBLICO_DA_VPS> demo-rag.opiagile.com
 ```
 
 Depois acesse:

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Opiagile Developers | Console API</title>
+    <meta
+      name="description"
+      content="Console interativo da Opiagile para testar endpoints do RAG Core com API key tenant-aware."
+    />
+    <link rel="icon" href="/developers/opiagile-logo.png" />
+    <link rel="stylesheet" href="/webjars/swagger-ui/swagger-ui.css" />
+    <link rel="stylesheet" href="/developers/swagger-console.css" />
+  </head>
+  <body>
+    <header class="console-header">
+      <div class="console-container header-inner">
+        <a class="brand" href="/developers">
+          <img class="brand-logo" src="/developers/opiagile-logo.png" alt="" />
+          <span>
+            <strong>Opiagile</strong>
+            <small>Console API</small>
+          </span>
+        </a>
+        <nav class="console-nav" aria-label="Navegação do console">
+          <a href="/developers">Portal</a>
+          <a href="/v3/api-docs/rag-core">OpenAPI JSON</a>
+          <a href="https://demo-rag.opiagile.com">Demo RAG</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="console-hero console-container">
+        <div>
+          <span class="badge">Console interativo</span>
+          <h1>Teste o contrato da API em um ambiente visual.</h1>
+          <p>
+            Informe uma API key em <strong>Authorize</strong>, execute chamadas e valide schemas antes de conectar
+            seu portal, gateway ou automação.
+          </p>
+        </div>
+        <aside class="quick-guide">
+          <span>Guia rápido</span>
+          <ol>
+            <li>Clique em <strong>Authorize</strong>.</li>
+            <li>Informe <code>X-OPIAGILE-API-KEY</code>.</li>
+            <li>Teste <code>POST /api/chat</code> ou <code>GET /api/workspaces</code>.</li>
+          </ol>
+        </aside>
+      </section>
+
+      <section class="console-container console-shell">
+        <div class="console-toolbar">
+          <div>
+            <strong>RAG Core API</strong>
+            <span>Chat, documentos, workspaces, fontes e observabilidade.</span>
+          </div>
+          <a class="button" href="/developers">Voltar ao portal</a>
+        </div>
+        <div id="swagger-ui"></div>
+      </section>
+    </main>
+
+    <script src="/webjars/swagger-ui/swagger-ui-bundle.js"></script>
+    <script src="/webjars/swagger-ui/swagger-ui-standalone-preset.js"></script>
+    <script src="/developers/swagger-console.js"></script>
+  </body>
+</html>

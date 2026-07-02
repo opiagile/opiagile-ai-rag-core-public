@@ -14,10 +14,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 @Component
 @ConditionalOnProperty(name = "openai.embeddings.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "openai.embeddings.provider", havingValue = "manual", matchIfMissing = true)
 public class OpenAiEmbeddingProvider implements EmbeddingProvider {
 
     private final RestClient restClient;

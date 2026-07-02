@@ -52,4 +52,22 @@ class TextSimilarityScorerTest {
 
         assertThat(score).isGreaterThanOrEqualTo(0.50);
     }
+
+    @Test
+    void devePontuarCancelamentoEmInglesContraConteudoDeRescisao() {
+        double score = scorer.score(
+                "What happens if I want to cancel?",
+                "Pedido de cancelamento, rescisao ou encerramento de contrato deve ser encaminhado para humano.");
+
+        assertThat(score).isGreaterThanOrEqualTo(0.50);
+    }
+
+    @Test
+    void devePontuarConsultaExpandidaDeCancelamentoContraConteudoEmIngles() {
+        double score = scorer.score(
+                "What happens if I want to cancel a rental? cancelamento rescisao locacao",
+                "Cancellation, contract termination or ending a rental agreement must be routed to a human analyst.");
+
+        assertThat(score).isGreaterThanOrEqualTo(0.80);
+    }
 }

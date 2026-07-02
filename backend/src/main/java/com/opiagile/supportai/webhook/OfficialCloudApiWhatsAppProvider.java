@@ -13,7 +13,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 @Component
 @ConditionalOnProperty(name = "whatsapp.provider", havingValue = "META_CLOUD")

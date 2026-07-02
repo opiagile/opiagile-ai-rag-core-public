@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.opiagile.supportai.chat.ChatRequest;
 import com.opiagile.supportai.chat.ChatResponse;
 import com.opiagile.supportai.chat.ChatService;

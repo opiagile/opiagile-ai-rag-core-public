@@ -1,18 +1,94 @@
 {
-    email {$ACME_EMAIL}
+	email {$ACME_EMAIL}
 }
 
-{$RAG_DOMAIN} {
-    encode zstd gzip
-    request_body {
-        max_size {$CADDY_REQUEST_BODY_MAX_SIZE:300KB}
-    }
-    reverse_proxy api:8080
+{$SITE_DOMAIN}, {$SITE_WWW_DOMAIN} {
+	encode zstd gzip
+	request_body {
+		max_size {$CADDY_REQUEST_BODY_MAX_SIZE:300KB}
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+	}
+
+	@site_chat path /api/chat
+	handle @site_chat {
+		reverse_proxy site:3000 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	@core_public path /api/developer-access-requests /api/documents /api/documents/* /api/workspaces /api/workspaces/* /api/conversations /api/conversations/* /api/observability /api/observability/* /api/handoffs /api/handoffs/* /api/providers /api/providers/* /api/tools /api/tools/* /api/version /actuator/health /developers /developers/* /v3/api-docs /v3/api-docs/* /swagger-ui/* /swagger-ui.html /webjars/* /webjars
+	handle @core_public {
+		reverse_proxy api:8080 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle {
+		reverse_proxy site:3000 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
 }
 {$DEMO_RAG_DOMAIN} {
-    encode zstd gzip
-    request_body {
-        max_size {$CADDY_REQUEST_BODY_MAX_SIZE:300KB}
-    }
-    reverse_proxy demo-web:3000
+	encode zstd gzip
+	request_body {
+		max_size {$CADDY_REQUEST_BODY_MAX_SIZE:300KB}
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+	}
+
+	@core_public path /api/chat /api/developer-access-requests /api/documents /api/documents/* /api/workspaces /api/workspaces/* /api/conversations /api/conversations/* /api/observability /api/observability/* /api/handoffs /api/handoffs/* /api/providers /api/providers/* /api/tools /api/tools/* /api/version /actuator/health /developers /developers/* /v3/api-docs /v3/api-docs/* /swagger-ui/* /swagger-ui.html /webjars/* /webjars
+	handle @core_public {
+		reverse_proxy api:8080 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle {
+		reverse_proxy demo-web:3000 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+}
+
+:9090 {
+	encode zstd gzip
+	request_body {
+		max_size 20KB
+	}
+
+	header {
+		X-Robots-Tag "noindex, nofollow"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+	}
+
+	@admin_api path /api/admin/*
+	handle @admin_api {
+		reverse_proxy api:8080 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle {
+		root * /srv/admin-panel
+		try_files {path} /index.html
+		file_server
+	}
 }

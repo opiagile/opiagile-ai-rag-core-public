@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Opiagile Admin | Solicitações Developer</title>
+    <link rel="stylesheet" href="/styles.css?v=20260630-3" />
+  </head>
+  <body>
+    <main class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">O</span>
+          <div>
+            <strong>Opiagile Admin</strong>
+            <small>Painel interno via túnel SSH</small>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Administração">
+          <a href="#requests" class="active">Solicitações</a>
+          <a href="#approval">Aprovação</a>
+          <a href="#security">Segurança</a>
+        </nav>
+
+        <section class="security-note" id="security">
+          <strong>Acesso restrito</strong>
+          <p>
+            Este painel deve ser aberto somente por túnel SSH. O token administrativo
+            não é embutido no código e precisa ser informado manualmente.
+          </p>
+        </section>
+      </aside>
+
+      <section class="content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Operação sandbox</p>
+            <h1>Solicitações de API key</h1>
+            <p>
+              Liste pedidos do portal developers e aprove uma chave sandbox para
+              um sandbox temporário ou workspace autorizado.
+            </p>
+          </div>
+          <span class="badge">localhost:9090</span>
+        </header>
+
+        <section class="card token-card">
+          <div>
+            <label for="admin-token">Token administrativo</label>
+            <input id="admin-token" type="password" autocomplete="off" placeholder="X-Demo-Admin-Token" />
+          </div>
+          <label class="checkbox">
+            <input id="remember-token" type="checkbox" />
+            Manter neste navegador
+          </label>
+          <button id="clear-token" type="button" class="ghost">Limpar</button>
+        </section>
+
+        <section class="grid">
+          <article class="card requests-card" id="requests">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Fila</p>
+                <h2>Solicitações recebidas</h2>
+              </div>
+              <div class="toolbar">
+                <select id="status-filter" aria-label="Status">
+                  <option value="NEW">Novas</option>
+                  <option value="APPROVED">Aprovadas</option>
+                  <option value="ALL">Todas</option>
+                </select>
+                <button id="load-requests" type="button">Carregar</button>
+              </div>
+            </div>
+            <div id="requests-list" class="requests-list" aria-live="polite">
+              <p class="muted">Informe o token e carregue as solicitações.</p>
+            </div>
+          </article>
+
+          <article class="card approval-card" id="approval">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Aprovação</p>
+                <h2>Gerar chave sandbox</h2>
+              </div>
+            </div>
+
+            <form id="approval-form" class="form">
+              <label>
+                ID da solicitação
+                <input id="request-id" name="requestId" required placeholder="UUID da solicitação" />
+              </label>
+              <label>
+                Nome do cliente
+                <input id="client-name" name="clientName" placeholder="Sandbox - Empresa" />
+              </label>
+
+              <fieldset class="mode-options">
+                <legend>Tipo de liberação</legend>
+                <label>
+                  <input type="radio" name="approvalMode" value="temporary" checked />
+                  Criar sandbox temporário para este lead
+                </label>
+                <label>
+                  <input type="radio" name="approvalMode" value="existing" />
+                  Usar workspace existente
+                </label>
+              </fieldset>
+
+              <div id="temporary-sandbox-fields" class="notice-box">
+                <label>
+                  Validade do sandbox
+                  <select id="expires-in-hours" name="expiresInHours">
+                    <option value="24" selected>24 horas</option>
+                    <option value="48">48 horas</option>
+                    <option value="168">7 dias</option>
+                  </select>
+                </label>
+                <p>
+                  O backend cria tenant/workspace com o nome do cliente. Após expirar,
+                  o tenant/workspace e os dados enviados no sandbox são excluídos. A
+                  solicitação do lead permanece registrada para contato e auditoria
+                  operacional, em linha com LGPD.
+                </p>
+              </div>
+
+              <div id="existing-workspace-fields" class="existing-fields" hidden>
+                <div class="form-row">
+                  <label>
+                    Tenant
+                    <input id="tenant-slug" name="tenantSlug" value="demo" />
+                  </label>
+                  <label>
+                    Workspace
+                    <select id="workspace-slug" name="workspaceSlug">
+                      <option value="clinica-demo">clinica-demo</option>
+                    </select>
+                  </label>
+                </div>
+                <button id="load-workspaces" type="button" class="ghost">Carregar workspaces</button>
+                <p id="workspace-help" class="muted">
+                  Use este modo apenas para liberar chave em workspace já existente.
+                </p>
+              </div>
+              <label>
+                Limite por minuto
+                <input id="rate-limit" name="rateLimitPerMinute" type="number" min="1" max="120" value="30" />
+              </label>
+
+              <fieldset>
+                <legend>Escopos</legend>
+                <label><input type="checkbox" name="scope" value="chat:write" checked /> chat:write</label>
+                <label><input type="checkbox" name="scope" value="documents:upload" checked /> documents:upload</label>
+                <label><input type="checkbox" name="scope" value="documents:read" checked /> documents:read</label>
+                <label><input type="checkbox" name="scope" value="providers:read" checked /> providers:read</label>
+                <label><input type="checkbox" name="scope" value="workspaces:read" checked /> workspaces:read</label>
+              </fieldset>
+
+              <button type="submit" class="primary">Aprovar e gerar chave</button>
+            </form>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="key-dialog">
+      <form method="dialog" class="dialog-card">
+        <p class="eyebrow">Chave gerada</p>
+        <h2>Copie agora</h2>
+        <p class="muted">
+          A chave completa aparece somente nesta resposta. Depois disso, o banco
+          mantém apenas prefixo e hash.
+        </p>
+        <div id="generated-metadata" class="generated-metadata"></div>
+        <pre id="generated-key"></pre>
+        <div class="dialog-actions">
+          <button id="copy-key" type="button">Copiar chave</button>
+          <button type="submit" class="ghost">Fechar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js?v=20260630-3" type="module"></script>
+  </body>
+</html>

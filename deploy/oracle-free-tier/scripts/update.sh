@@ -15,4 +15,5 @@ fi
 cd "$DEPLOY_DIR"
 docker compose --env-file .env pull postgres caddy
 docker compose --env-file .env up -d --build
+docker compose --env-file .env restart caddy
 docker image prune -f

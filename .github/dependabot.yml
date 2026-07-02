@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Porto_Velho"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencias"
+      - "seguranca"
+
+  - package-ecosystem: "docker"
+    directory: "/deploy/oracle-free-tier"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:30"
+      timezone: "America/Porto_Velho"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencias"
+      - "seguranca"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Porto_Velho"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencias"
+      - "seguranca"

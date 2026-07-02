@@ -7,8 +7,8 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.opiagile.supportai.tenant.TenantContext;
 
 @Repository
@@ -79,7 +79,7 @@ public class RetrievalLogRepository {
                 .toList();
         try {
             return objectMapper.writeValueAsString(payload);
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalStateException("Não foi possível serializar os chunks recuperados.", exception);
         }
     }

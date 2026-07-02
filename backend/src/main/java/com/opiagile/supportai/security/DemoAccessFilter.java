@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.opiagile.supportai.common.ErrorResponse;
 
 import jakarta.servlet.FilterChain;
@@ -35,7 +35,7 @@ public class DemoAccessFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (isDemoWriteEndpoint(request) && !policy.accessTokenMatches(request)) {
+        if (isDemoWriteEndpoint(request) && !hasApiClientScope(request) && !policy.accessTokenMatches(request)) {
             writeError(response, HttpStatus.UNAUTHORIZED, "TOKEN_DEMO_INVALIDO", "Token da demo ausente ou inválido.");
             return;
         }
@@ -52,6 +52,12 @@ public class DemoAccessFilter extends OncePerRequestFilter {
 
     private boolean isDemoWriteEndpoint(HttpServletRequest request) {
         return isChat(request) || isUpload(request);
+    }
+
+    private boolean hasApiClientScope(HttpServletRequest request) {
+        return ApiClientContextHolder.current()
+                .map(context -> isUpload(request) ? context.hasScope("documents:upload") : context.hasScope("chat:write"))
+                .orElse(false);
     }
 
     private boolean isRateLimitedEndpoint(HttpServletRequest request) {
@@ -71,6 +77,10 @@ public class DemoAccessFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
+        }
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
             return forwardedFor.split(",")[0].trim();

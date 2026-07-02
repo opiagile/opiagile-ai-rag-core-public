@@ -1,21 +1,38 @@
 # FAQ Atendimento Demo
 
-## Horário de atendimento
+## Objetivo
 
-O atendimento humano funciona de segunda a sexta, das 9h às 18h.
+Base ficticia para demonstrar atendimento geral, triagem operacional e encaminhamento humano. A IA deve responder com objetividade, usar somente as informacoes deste arquivo e pedir handoff quando a solicitacao exigir analise tecnica, financeira, comercial ou juridica.
+
+## Horario de atendimento
+
+O atendimento humano funciona de segunda a sexta, das 9h as 18h. Mensagens recebidas fora desse horario devem ser registradas com resumo e retornadas no proximo periodo util.
 
 ## Prazo de retorno
 
-Mensagens recebidas dentro do horário comercial costumam receber retorno em até 2 horas úteis.
+Mensagens recebidas dentro do horario comercial costumam receber retorno em ate 2 horas uteis. Solicitações simples podem ser resolvidas no primeiro contato quando todas as informacoes estiverem completas.
+
+## Informacoes necessarias
+
+Para agilizar o atendimento, coletar nome, contato, empresa ou departamento, assunto principal, urgencia, impacto e um resumo objetivo da solicitacao. Quando houver anexo, protocolo, print ou evidencia, orientar o usuario a incluir esses dados no canal oficial.
 
 ## Encaminhamento para especialista
 
-Quando a solicitação exige análise técnica, financeira ou comercial detalhada, a conversa deve ser encaminhada para uma pessoa responsável.
+Encaminhar para especialista quando a solicitacao exigir analise tecnica profunda, avaliacao financeira, proposta comercial, revisao contratual, reclamacao, risco operacional ou qualquer decisao que nao esteja documentada na base.
 
-## Informações necessárias
+## Reclamacoes
 
-Para agilizar o atendimento, informe nome, contato, empresa ou departamento e um resumo objetivo da solicitação.
+Reclamacoes devem ser tratadas com prioridade. A IA deve reconhecer o problema, evitar justificativas longas, coletar contexto minimo e encaminhar para atendimento humano com resumo da conversa.
 
-## Reclamações
+## English quick answers
 
-Reclamações devem ser tratadas com prioridade e encaminhadas para atendimento humano com resumo da conversa.
+- Human support is available Monday to Friday from 9 AM to 6 PM.
+- Requests usually receive a response within 2 business hours during business time.
+- To speed up support, send name, contact, company or department, topic, urgency, impact and a short summary.
+- If the request requires a specialist, the assistant must route it to a person.
+
+## Respuestas rapidas en espanol
+
+- El atendimento humano funciona de lunes a viernes de 9 a 18 horas.
+- Las solicitudes suelen recibir respuesta en hasta 2 horas habiles durante el horario comercial.
+- Para agilizar, informar nombre, contacto, empresa o departamento, tema, urgencia, impacto y resumen.

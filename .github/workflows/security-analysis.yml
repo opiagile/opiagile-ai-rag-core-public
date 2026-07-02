@@ -1,0 +1,99 @@
+name: Análise de segurança
+
+on:
+  workflow_dispatch:
+    inputs:
+      rodar_dependency_check:
+        description: "Rodar OWASP Dependency-Check Maven. Recomendado configurar NVD_API_KEY para evitar timeout."
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    - cron: "20 9 * * 1"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  dependency-check:
+    name: Dependency-Check Maven
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.rodar_dependency_check == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Rodar OWASP Dependency-Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          cd backend
+          NVD_ARGS=""
+          if [ -n "${NVD_API_KEY:-}" ]; then
+            NVD_ARGS="-DnvdApiKey=${NVD_API_KEY}"
+          fi
+          ./mvnw -ntp org.owasp:dependency-check-maven:12.1.8:check \
+            -DfailBuildOnCVSS=9.0 \
+            -Dformats=HTML,JSON \
+            -DskipTestScope=true \
+            ${NVD_ARGS}
+
+      - name: Publicar relatório Dependency-Check
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: |
+            backend/target/dependency-check-report.html
+            backend/target/dependency-check-report.json
+          if-no-files-found: ignore
+
+  trivy:
+    name: Trivy filesystem
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rodar Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Publicar relatório Trivy
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sarif
+          path: trivy-results.sarif
+          if-no-files-found: ignore
+
+  smoke-publico:
+    name: Smoke público de segurança
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validar superfície pública
+        run: python3 scripts/security-smoke.py

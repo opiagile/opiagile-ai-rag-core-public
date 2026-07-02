@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Opiagile Developers | RAG Core API</title>
+    <meta
+      name="description"
+      content="Portal de desenvolvedores da Opiagile para testar a API do RAG Core com chat, documentos, fontes, workspaces e observabilidade."
+    />
+    <link rel="icon" href="/developers/opiagile-logo.png" />
+    <link rel="stylesheet" href="/developers/styles.css?v=20260630-4" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="https://opiagile.com" aria-label="Voltar para Opiagile">
+          <img class="brand-logo" src="/developers/opiagile-logo.png" alt="" />
+          <span>
+            <strong>Opiagile</strong>
+            <small>RAG Core API</small>
+          </span>
+        </a>
+        <nav class="main-nav" aria-label="Navegação principal">
+          <a href="https://opiagile.com">Início</a>
+          <a href="#recursos">Recursos</a>
+          <a href="#autenticacao">Autenticação</a>
+          <a href="#fluxo">Como testar</a>
+          <a href="https://demo-rag.opiagile.com">Demo RAG</a>
+        </nav>
+        <a class="button button-primary" href="/developers/console">Abrir console</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-copy">
+          <span class="badge">Portal de desenvolvedores</span>
+          <h1>Valide integrações com o RAG Core da Opiagile.</h1>
+          <p>
+            Teste chat com fontes, ingestão de documentos, workspaces, handoff e observabilidade em uma API preparada
+            para aplicações, portais, CRMs e gateways.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="/developers/console">Testar no console</a>
+            <a class="button button-secondary" href="/v3/api-docs/rag-core">Baixar OpenAPI JSON</a>
+            <a class="button button-secondary" href="#solicitar-chave">Solicitar chave sandbox</a>
+          </div>
+          <div class="trust-row" aria-label="Características da API">
+            <span>API key tenant-aware</span>
+            <span>Escopos por client</span>
+            <span>Fontes e trace</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="Exemplo de integração">
+          <div class="panel-header">
+            <span class="window-dot"></span>
+            <span>POST /api/chat</span>
+          </div>
+          <pre><code>curl https://opiagile.com/api/chat \
+  -H "Content-Type: application/json" \
+  -H "X-OPIAGILE-API-KEY: $OPIAGILE_API_KEY" \
+  -d '{
+    "message": "Quais integrações são possíveis?",
+    "channel": "WEB",
+    "contactId": "lead-demo"
+  }'</code></pre>
+          <div class="response-preview">
+            <span>Resposta</span>
+            <p>Resposta objetiva, fontes recuperadas, intenção, handoff e metadados operacionais.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="container section" id="recursos">
+        <div class="section-heading">
+          <p class="section-kicker">Recursos</p>
+          <h2>O que empresas e devs conseguem validar.</h2>
+          <p>O console expõe o contrato técnico sem perder o contexto de negócio da solução.</p>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <span class="card-number">01</span>
+            <h3>Chat com fontes</h3>
+            <p>Envie perguntas e confira resposta, fontes, intenção, idioma, handoff e modo de geração.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">02</span>
+            <h3>Workspaces isolados</h3>
+            <p>Organize dados por cliente, área, app ou departamento com API keys tenant-aware.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">03</span>
+            <h3>Documentos controlados</h3>
+            <p>Teste upload, listagem, detalhes e chunks sem expor banco de dados publicamente.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">04</span>
+            <h3>Trace operacional</h3>
+            <p>Acompanhe fontes, recuperação, latência, fallback e histórico de conversas.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="container split-section" id="autenticacao">
+        <div>
+          <p class="section-kicker">Autenticação</p>
+          <h2>Chaves por aplicação, cliente ou workspace.</h2>
+          <p>
+            Endpoints protegidos usam <code>X-OPIAGILE-API-KEY</code>. A chave deve ficar no backend do consumidor,
+            gateway, proxy ou server action. Nunca exponha uma credencial real no navegador.
+          </p>
+        </div>
+        <div class="scope-card">
+          <span>Escopos comuns</span>
+          <div>
+            <code>chat:write</code>
+            <code>documents:read</code>
+            <code>documents:upload</code>
+            <code>workspaces:read</code>
+            <code>observability:read</code>
+          </div>
+        </div>
+      </section>
+
+      <section class="container section" id="fluxo">
+        <div class="section-heading">
+          <p class="section-kicker">Como testar</p>
+          <h2>Validação rápida em três passos.</h2>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <strong>1</strong>
+            <h3>Solicite uma API key sandbox</h3>
+            <p>A liberação é manual para manter tenant, workspace, escopos e limite por minuto controlados.</p>
+          </div>
+          <div class="step">
+            <strong>2</strong>
+            <h3>Abra o console</h3>
+            <p>Cole a chave no campo <span class="inline-token">API key</span> do console Opiagile.</p>
+          </div>
+          <div class="step">
+            <strong>3</strong>
+            <h3>Teste chat e fontes</h3>
+            <p>Valide resposta, fontes, trace e comportamento antes de integrar seu app.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="container split-section access-section" id="solicitar-chave">
+        <div>
+          <p class="section-kicker">Acesso sandbox</p>
+          <h2>Solicite uma chave para testar com segurança.</h2>
+          <p>
+            A chave sandbox é liberada manualmente. Assim conseguimos criar um ambiente temporário,
+            definir escopos, limitar uso e orientar o primeiro teste sem expor credenciais sensíveis.
+          </p>
+          <p class="access-note">
+            O sandbox pode expirar em 24h, 48h ou 7 dias, conforme liberação. Ao expirar, tenant,
+            workspace e dados enviados para teste são removidos do sandbox. A solicitação do lead
+            permanece registrada para contato, auditoria operacional e continuidade comercial,
+            sempre respeitando LGPD.
+          </p>
+        </div>
+        <div class="scope-card request-card">
+          <span>Inclua na solicitação</span>
+          <ul class="request-list">
+            <li>Nome, empresa e email de contato.</li>
+            <li>Objetivo do teste ou caso de uso.</li>
+            <li>Se precisa apenas de chat, documentos, observabilidade ou todos os recursos.</li>
+            <li>Ambiente de uso: portal, CRM, gateway, automação ou app próprio.</li>
+          </ul>
+          <button class="button button-primary request-button" type="button" data-open-access-dialog>
+            Abrir formulário
+          </button>
+        </div>
+      </section>
+
+      <section class="container final-cta">
+        <div>
+          <p class="section-kicker">Pronto para integrar</p>
+          <h2>Use o console para sair da conversa técnica para o teste real.</h2>
+          <p>Valide o contrato, confira schemas e avance para um piloto controlado com segurança.</p>
+        </div>
+        <a class="button button-primary" href="/developers/console">Abrir console interativo</a>
+      </section>
+    </main>
+
+    <dialog class="access-dialog" id="access-dialog" aria-labelledby="access-dialog-title">
+      <form class="access-form" id="access-form" method="dialog">
+        <div class="dialog-header">
+          <div>
+            <p class="section-kicker">Solicitação de acesso</p>
+            <h2 id="access-dialog-title">API key sandbox</h2>
+          </div>
+          <button class="dialog-close" type="button" data-close-access-dialog aria-label="Fechar formulário">×</button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            <span>Nome</span>
+            <input name="name" type="text" autocomplete="name" maxlength="160" required />
+          </label>
+          <label>
+            <span>Empresa</span>
+            <input name="company" type="text" autocomplete="organization" maxlength="180" />
+          </label>
+          <label class="full-field">
+            <span>Email</span>
+            <input name="email" type="email" autocomplete="email" maxlength="180" required />
+          </label>
+          <label class="full-field">
+            <span>Objetivo do teste</span>
+            <textarea name="useCase" rows="4" maxlength="2000" required></textarea>
+          </label>
+          <fieldset class="full-field resource-options">
+            <legend>Recursos que pretende validar</legend>
+            <p>Deixe todos marcados se quiser acesso sandbox completo para teste inicial.</p>
+            <label><input type="checkbox" name="requestedResourceOption" value="Chat com RAG e fontes" checked /> Chat com RAG e fontes</label>
+            <label><input type="checkbox" name="requestedResourceOption" value="Upload e consulta de documentos" checked /> Upload e consulta de documentos</label>
+            <label><input type="checkbox" name="requestedResourceOption" value="Workspaces e isolamento por tenant" checked /> Workspaces e isolamento por tenant</label>
+            <label><input type="checkbox" name="requestedResourceOption" value="Status de provedores" checked /> Status de provedores</label>
+            <label><input type="checkbox" name="requestedResourceOption" value="Observabilidade e traces" checked /> Observabilidade e traces</label>
+          </fieldset>
+          <label class="website-field" aria-hidden="true">
+            <span>Website</span>
+            <input name="website" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        <p class="form-help">
+          A solicitação será registrada para análise e follow-up. Se liberado, o sandbox será temporário:
+          dados enviados no ambiente de teste serão removidos quando ele expirar. Não envie senhas,
+          tokens, dados sensíveis ou documentos privados neste formulário.
+        </p>
+        <p class="form-status" id="access-form-status" role="status" aria-live="polite"></p>
+        <div
+          class="sandbox-approval-note"
+          id="sandbox-approval-note"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <strong>Se aprovado, você receberá os dados essenciais do sandbox.</strong>
+          <p>
+            Enviaremos a API key, tenant, workspace, validade do ambiente, escopos liberados
+            e limite de uso. O sandbox é temporário: ao expirar, tenant/workspace e dados
+            enviados para teste são excluídos. A solicitação permanece registrada para
+            contato e acompanhamento, conforme práticas de LGPD.
+          </p>
+        </div>
+
+        <div class="dialog-actions">
+          <button class="button button-secondary" type="button" data-close-access-dialog>Cancelar</button>
+          <button class="button button-primary" type="submit">Enviar solicitação</button>
+        </div>
+      </form>
+    </dialog>
+    <script src="/developers/access-request.js?v=20260630-4"></script>
+  </body>
+</html>

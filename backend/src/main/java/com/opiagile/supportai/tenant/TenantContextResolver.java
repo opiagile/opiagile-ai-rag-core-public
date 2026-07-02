@@ -3,6 +3,8 @@ package com.opiagile.supportai.tenant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.opiagile.supportai.security.ApiClientContextHolder;
+
 @Component
 public class TenantContextResolver {
 
@@ -20,6 +22,12 @@ public class TenantContextResolver {
     }
 
     public TenantContext resolve(String tenantHeader, String workspaceHeader) {
+        return ApiClientContextHolder.current()
+                .map(context -> context.tenantContext())
+                .orElseGet(() -> resolveFromHeaders(tenantHeader, workspaceHeader));
+    }
+
+    private TenantContext resolveFromHeaders(String tenantHeader, String workspaceHeader) {
         String tenantSlug = normalize(tenantHeader, defaultTenant);
         String workspaceSlug = normalize(workspaceHeader, defaultWorkspace);
         return tenantRepository.findContext(tenantSlug, workspaceSlug)
@@ -27,7 +35,13 @@ public class TenantContextResolver {
     }
 
     public String resolveTenantSlug(String tenantHeader) {
-        return normalize(tenantHeader, defaultTenant);
+        return ApiClientContextHolder.current()
+                .map(context -> context.tenantContext().tenantSlug())
+                .orElseGet(() -> normalize(tenantHeader, defaultTenant));
+    }
+
+    public TenantContext defaultContext() {
+        return resolveFromHeaders(defaultTenant, defaultWorkspace);
     }
 
     private String normalize(String value, String fallback) {

@@ -45,7 +45,10 @@ sequenceDiagram
     Chat->>DB: cria/atualiza conversa e mensagens
     Chat->>RAG: recupera chunks relevantes
     RAG->>DB: consulta documentos indexados
-    Chat->>LLM: gera resposta DEMO ou LLM com fontes/histórico
+    opt pergunta operacional sobre dados do workspace
+        Chat->>DB: executa ferramenta controlada read-only pré-aprovada
+    end
+    Chat->>LLM: gera resposta DEMO ou LLM com fontes, histórico e resultados controlados
     Chat->>DB: registra retrieval_logs e mensagens
     Chat->>DB: atualiza lead
     alt precisa humano
@@ -58,13 +61,92 @@ sequenceDiagram
 
 - `document`: upload TXT, chunking, embeddings opcionais e persistência de documentos.
 - `rag`: recuperação textual/local, embeddings OpenAI opcionais, pgvector e logs de retrieval.
-- `chat`: orquestra conversa, RAG, geração DEMO/LLM, lead e handoff.
+- `chat`: orquestra conversa, RAG, ferramentas controladas, geração DEMO/LLM, lead e handoff.
 - `conversation`: histórico, resumo e memória básica.
 - `lead`: intenção, extração simples e qualificação.
 - `handoff`: fila operacional humana.
+- `security`: API keys tenant-aware, escopos, rate limit e compatibilidade com tokens de demo.
 - `webhook`: piloto preservado de canal WhatsApp, mantido como referência técnica para extração futura.
 - `observability`: trace por conversa.
+- `config/OpenAPI`: especificação OpenAPI, console Swagger customizado e portal `/developers`.
 - `frontend-handoff`: documentação de contrato para interface visual em repositório separado.
+
+## Segurança E Autorização
+
+A v0.10 adiciona API clients tenant-aware para gateways e aplicações externas. Cada client possui:
+
+- tenant/workspace vinculado;
+- hash SHA-256 da API key;
+- prefixo curto para identificação operacional;
+- lista de escopos;
+- status `ACTIVE` ou `REVOKED`;
+- rate limit por minuto.
+
+O filtro `ApiClientAuthenticationFilter` autentica chamadas com `X-OPIAGILE-API-KEY` ou `Authorization: Bearer`, valida escopo por endpoint, aplica rate limit em memória e injeta o contexto autenticado. Quando esse contexto existe, `TenantContextResolver` usa o tenant/workspace da credencial e ignora headers livres.
+
+Escopos atuais:
+
+- `chat:write`;
+- `documents:read`;
+- `documents:upload`;
+- `conversations:read`;
+- `observability:read`;
+- `handoffs:read`;
+- `handoffs:write`;
+- `tools:read`;
+- `tools:execute`;
+- `workspaces:read`.
+
+Para compatibilidade, `API_SECURITY_REQUIRE_API_KEY=false` mantém o modo legado local. Em ambiente exposto ou multiempresa, a configuração recomendada é `API_SECURITY_REQUIRE_API_KEY=true`.
+
+Essa camada não é login de usuário final. Se o projeto evoluir para painel administrativo multiusuário, a recomendação é adicionar autenticação OIDC/JWT e RBAC por papel, mantendo as API keys para gateways server-to-server.
+
+A v0.11 adiciona auditoria operacional em `api_client_usage_logs`. O filtro registra eventos permitidos e bloqueados com client, tenant/workspace, endpoint, escopo, status HTTP, motivo de bloqueio, IP, user agent e latência. API keys e payloads não são registrados. O endpoint administrativo `GET /api/admin/api-clients/usage` retorna resumo por client e eventos recentes mediante token administrativo.
+
+## Portal De Desenvolvedores
+
+O core expõe uma camada de documentação interativa para integração:
+
+- `GET /developers`: portal visual com proposta da API, exemplos e instrução de autenticação;
+- `GET /developers/console`: redirecionamento para o console Opiagile com navegação lateral;
+- `GET /developers/api-console/index.html`: console próprio que consome OpenAPI e executa endpoints;
+- `GET /developers/swagger-ui/index.html`: console Swagger embutido em página Opiagile, preservado como fallback técnico;
+- `GET /v3/api-docs/rag-core`: especificação OpenAPI do grupo público de integração.
+
+O grupo `rag-core` documenta endpoints úteis para apps, gateways e empresas consumidoras:
+
+- chat;
+- documentos;
+- workspaces;
+- conversas;
+- observabilidade;
+- handoffs;
+- ferramentas controladas;
+- versão.
+
+Endpoints administrativos, site-chat interno e webhooks de canal ficam fora desse grupo para reduzir ruído e evitar exposição desnecessária no console comercial.
+
+O console Opiagile aceita `X-OPIAGILE-API-KEY` em campo próprio e mantém o valor apenas em `sessionStorage`. O Swagger clássico aceita a mesma chave pelo botão `Authorize`. A chave continua sendo responsabilidade do consumidor e não deve ser colocada em frontend público. A documentação interativa pode ser desligada por ambiente com:
+
+```text
+OPENAPI_ENABLED=false
+OPENAPI_UI_ENABLED=false
+```
+
+## Ferramentas Controladas
+
+Ferramentas são cadastradas por tenant/workspace em `external_tools`. A execução gera auditoria em `external_tool_execution_logs`.
+
+Na versão atual, `base-conhecimento-readonly` permite consultas read-only pré-aprovadas sobre `documents`, `document_chunks` e `retrieval_logs`. O `ControlledToolPlanner` usa essa ferramenta para perguntas como:
+
+- quantos documentos existem no workspace;
+- quais documentos estão indexados;
+- quantos trechos existem por documento;
+- quais consultas recentes foram registradas.
+
+O usuário final não envia SQL no chat. O planner constrói consultas conhecidas, o `SqlReadOnlyGuard` valida tabelas e comandos permitidos, e o resultado entra no prompt como contexto factual adicional.
+
+Quando `TOOLS_PLANNER_LLM_ENABLED=true`, o `OpenAiToolPlanProvider` pode classificar perguntas operacionais menos literais em uma ação permitida. A resposta aceita do planner é restrita a JSON com `DOCUMENT_COUNT`, `DOCUMENT_LIST`, `CHUNK_STATS`, `RECENT_RETRIEVALS` ou `NONE`; qualquer baixa confiança, ação desconhecida ou JSON inválido vira `NONE`.
 
 ## WhatsApp
 

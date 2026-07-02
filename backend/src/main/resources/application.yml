@@ -9,6 +9,19 @@ server:
 spring:
   application:
     name: ${app.name}
+  ai:
+    model:
+      chat: ${SPRING_AI_MODEL_CHAT:none}
+      embedding: ${SPRING_AI_MODEL_EMBEDDING:none}
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:${OPENAI_MODEL:gpt-5-mini}}
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+          dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:1536}
   servlet:
     multipart:
       max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:256KB}
@@ -20,20 +33,53 @@ spring:
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
     locations: classpath:db/migration
+  mail:
+    host: ${SPRING_MAIL_HOST:}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${SPRING_MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${SPRING_MAIL_SMTP_STARTTLS_ENABLE:true}
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+  health:
+    mail:
+      enabled: ${SPRING_MAIL_HEALTH_ENABLED:false}
   endpoint:
     health:
       probes:
         enabled: true
 
+springdoc:
+  api-docs:
+    enabled: ${OPENAPI_ENABLED:true}
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${OPENAPI_UI_ENABLED:false}
+    path: /developers/swagger-ui-raw
+    urls:
+      - name: rag-core
+        url: /v3/api-docs/rag-core
+    urls-primary-name: rag-core
+    display-request-duration: true
+    doc-expansion: none
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    filter: true
+
 openai:
   embeddings:
     enabled: ${OPENAI_EMBEDDINGS_ENABLED:false}
+    provider: ${OPENAI_EMBEDDINGS_PROVIDER:manual}
   api-key: ${OPENAI_API_KEY:}
   embedding-model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
   embedding-dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:1536}
@@ -69,9 +115,22 @@ demo:
       chat-per-minute: ${DEMO_CHAT_RATE_LIMIT_PER_MINUTE:30}
       upload-per-minute: ${DEMO_UPLOAD_RATE_LIMIT_PER_MINUTE:5}
 
+api-security:
+  enabled: ${API_SECURITY_ENABLED:true}
+  require-api-key: ${API_SECURITY_REQUIRE_API_KEY:false}
+  default-rate-limit-per-minute: ${API_SECURITY_DEFAULT_RATE_LIMIT_PER_MINUTE:60}
+
 rag:
   top-k: ${RAG_TOP_K:5}
   min-score: ${RAG_MIN_SCORE:0.15}
+
+tools:
+  execution:
+    require-admin-token: ${TOOLS_EXECUTION_REQUIRE_ADMIN_TOKEN:true}
+  planner:
+    llm:
+      enabled: ${TOOLS_PLANNER_LLM_ENABLED:true}
+      max-output-tokens: ${TOOLS_PLANNER_LLM_MAX_OUTPUT_TOKENS:120}
 
 conversation:
   history-limit: ${CONVERSATION_HISTORY_LIMIT:8}
@@ -79,6 +138,33 @@ conversation:
 tenant:
   default-tenant: ${TENANT_DEFAULT_TENANT:demo}
   default-workspace: ${TENANT_DEFAULT_WORKSPACE:clinica-demo}
+
+site-chat:
+  enabled: ${SITE_CHAT_ENABLED:true}
+  api-key: ${SITE_CHAT_API_KEY:}
+  tenant: ${SITE_CHAT_TENANT:opiagile}
+  workspace: ${SITE_CHAT_WORKSPACE:opiagile-rag}
+  rate-limit-per-minute: ${SITE_CHAT_RATE_LIMIT_PER_MINUTE:20}
+
+developer-access:
+  sandbox:
+    cleanup:
+      enabled: ${DEVELOPER_ACCESS_SANDBOX_CLEANUP_ENABLED:true}
+      fixed-delay-ms: ${DEVELOPER_ACCESS_SANDBOX_CLEANUP_FIXED_DELAY_MS:300000}
+      batch-size: ${DEVELOPER_ACCESS_SANDBOX_CLEANUP_BATCH_SIZE:25}
+  email:
+    enabled: ${DEVELOPER_ACCESS_EMAIL_ENABLED:false}
+    to: ${DEVELOPER_ACCESS_EMAIL_TO:contato@opiagile.com}
+    from: ${DEVELOPER_ACCESS_EMAIL_FROM:contato@opiagile.com}
+    subject-prefix: ${DEVELOPER_ACCESS_EMAIL_SUBJECT_PREFIX:[Opiagile] Solicitação de API key sandbox}
+    public-base-url: ${DEVELOPER_ACCESS_EMAIL_PUBLIC_BASE_URL:https://opiagile.com}
+    key-delivery-expires-in-hours: ${DEVELOPER_ACCESS_KEY_DELIVERY_EXPIRES_IN_HOURS:24}
+    scheduler:
+      enabled: ${DEVELOPER_ACCESS_EMAIL_SCHEDULER_ENABLED:true}
+      fixed-delay-ms: ${DEVELOPER_ACCESS_EMAIL_SCHEDULER_FIXED_DELAY_MS:60000}
+      batch-size: ${DEVELOPER_ACCESS_EMAIL_SCHEDULER_BATCH_SIZE:5}
+      max-attempts: ${DEVELOPER_ACCESS_EMAIL_SCHEDULER_MAX_ATTEMPTS:10}
+      retry-delay-minutes: ${DEVELOPER_ACCESS_EMAIL_SCHEDULER_RETRY_DELAY_MINUTES:15}
 
 intent:
   llm:

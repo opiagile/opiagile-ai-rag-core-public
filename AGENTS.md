@@ -23,7 +23,7 @@ Interfaces gráficas não devem ser desenvolvidas neste repositório. O estado d
 - Linux ARM64/aarch64 em VM Parallels.
 - Priorizar imagens Docker e pacotes com suporte a Linux ARM64.
 - Não assumir ambiente x86_64.
-- API: Java 21, Maven, Spring Boot 3.5.x e Spring AI 1.1.x.
+- API: Java 25 LTS, Maven, Spring Boot 4.1.x e Spring AI 2.0.x.
 - Banco: PostgreSQL com pgvector.
 - Frontend: fora do escopo deste repositório. Use `docs/frontend-handoff.md` para criar projeto separado.
 

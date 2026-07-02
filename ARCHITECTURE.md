@@ -32,6 +32,8 @@ flowchart LR
     Chat --> Memoria[Memória Conversacional]
     Chat --> Recuperacao[RAG Textual ou pgvector]
     Recuperacao --> Banco[(PostgreSQL + pgvector)]
+    Chat --> Tools[Ferramentas Controladas]
+    Tools --> Banco
     Chat --> Modelo[Resposta DEMO ou LLM]
     Chat --> Lead[Lead]
     Chat --> Handoff[Handoff Humano]
@@ -45,6 +47,12 @@ flowchart LR
 - Frontend separado: deve consumir a API conforme `docs/frontend-handoff.md`.
 - WhatsApp mock e Cloud API piloto: preservados como referência técnica, não como foco evolutivo do core.
 - Contrato para gateways: [`docs/gateway-contract.md`](docs/gateway-contract.md).
+
+## Ferramentas Controladas
+
+O core possui uma camada de tools por tenant/workspace. A primeira ferramenta é `SQL_READ_ONLY`, com allowlist de tabelas, limite de linhas e log de execução. O chat pode usar resultados de consultas pré-aprovadas para responder perguntas operacionais simples sobre a base de conhecimento, como documentos indexados, trechos por documento e consultas recentes.
+
+A LLM não recebe credenciais e não executa SQL livre. Quando o planner LLM está habilitado, ele só escolhe entre ações permitidas; o backend decide as consultas reais, valida pelo guard read-only e entrega apenas o resultado como contexto factual.
 
 ## Documentação Técnica
 

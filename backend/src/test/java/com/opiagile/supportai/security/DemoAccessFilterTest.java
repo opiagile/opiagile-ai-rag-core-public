@@ -12,12 +12,11 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
 
 class DemoAccessFilterTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void devePermitirChatSemTokenQuandoTokenNaoEstaConfigurado() throws Exception {
@@ -62,6 +61,27 @@ class DemoAccessFilterTest {
         assertThat(run(filter, post("/api/chat"))).isEqualTo(HttpStatus.OK.value());
         assertThat(run(filter, post("/api/chat"))).isEqualTo(HttpStatus.TOO_MANY_REQUESTS.value());
         assertThat(run(filter, post("/api/documents/upload"))).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void deveUsarXRealIpParaRateLimitQuandoDisponivel() throws Exception {
+        DemoAccessFilter filter = filter(policy("", "", true, 1, 10));
+
+        MockHttpServletRequest primeira = post("/api/chat");
+        primeira.addHeader("X-Real-IP", "198.51.100.20");
+        primeira.addHeader("X-Forwarded-For", "203.0.113.20");
+
+        MockHttpServletRequest segundaMesmoIpReal = post("/api/chat");
+        segundaMesmoIpReal.addHeader("X-Real-IP", "198.51.100.20");
+        segundaMesmoIpReal.addHeader("X-Forwarded-For", "203.0.113.21");
+
+        MockHttpServletRequest terceiraOutroIpReal = post("/api/chat");
+        terceiraOutroIpReal.addHeader("X-Real-IP", "198.51.100.21");
+        terceiraOutroIpReal.addHeader("X-Forwarded-For", "203.0.113.20");
+
+        assertThat(run(filter, primeira)).isEqualTo(HttpStatus.OK.value());
+        assertThat(run(filter, segundaMesmoIpReal)).isEqualTo(HttpStatus.TOO_MANY_REQUESTS.value());
+        assertThat(run(filter, terceiraOutroIpReal)).isEqualTo(HttpStatus.OK.value());
     }
 
     private int run(DemoAccessFilter filter, MockHttpServletRequest request) throws Exception {

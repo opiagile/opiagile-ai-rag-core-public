@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Opiagile Developers | API Console</title>
+    <meta
+      name="description"
+      content="Console API da Opiagile com menu lateral, autenticação por API key e execução interativa de endpoints do RAG Core."
+    />
+    <link rel="icon" href="/developers/opiagile-logo.png" />
+    <link rel="stylesheet" href="/developers/api-console/api-console.css" />
+  </head>
+  <body>
+    <header class="console-header">
+      <a class="brand" href="/developers" aria-label="Voltar para o portal de desenvolvedores">
+        <img class="brand-logo" src="/developers/opiagile-logo.png" alt="" />
+        <span>
+          <strong>Opiagile</strong>
+          <small>API Console</small>
+        </span>
+      </a>
+      <nav class="top-nav" aria-label="Navegação do console">
+        <a href="/developers">Portal</a>
+        <a href="/developers/swagger-ui/index.html">Swagger clássico</a>
+        <a href="/v3/api-docs/rag-core">OpenAPI JSON</a>
+      </nav>
+    </header>
+
+    <main class="console-layout">
+      <aside class="sidebar" aria-label="Endpoints da API">
+        <section class="sidebar-card">
+          <span class="eyebrow">Ambiente</span>
+          <label class="field-label" for="server-select">Servidor</label>
+          <select id="server-select" class="control"></select>
+          <label class="field-label" for="api-key-input">X-OPIAGILE-API-KEY</label>
+          <div class="secret-row">
+            <input id="api-key-input" class="control" type="password" autocomplete="off" placeholder="Cole sua API key sandbox" />
+            <button id="toggle-key" class="icon-button" type="button" aria-label="Mostrar ou ocultar API key">Ver</button>
+          </div>
+          <p class="hint">A chave fica apenas nesta sessão do navegador. Não use credenciais reais em prints ou repositórios.</p>
+        </section>
+
+        <section class="sidebar-card">
+          <span class="eyebrow">Workspace</span>
+          <p class="hint">
+            Em ambiente exposto, a API key já define tenant, workspace, escopos e limite. Os headers
+            <code>X-Tenant-Id</code> e <code>X-Workspace-Id</code> não precisam ser enviados.
+          </p>
+          <button id="load-workspaces" class="sidebar-action" type="button">Carregar workspaces da chave</button>
+          <div id="workspace-result" class="workspace-result">Cole uma API key e carregue os workspaces permitidos.</div>
+        </section>
+
+        <section class="sidebar-card">
+          <label class="field-label" for="operation-search">Buscar endpoint</label>
+          <input id="operation-search" class="control" type="search" placeholder="chat, documentos, trace..." />
+        </section>
+
+        <nav id="operation-list" class="operation-list" aria-label="Lista de operações"></nav>
+      </aside>
+
+      <section class="workspace">
+        <div id="status-banner" class="status-banner" role="status">Carregando contrato OpenAPI...</div>
+
+        <section id="operation-panel" class="operation-panel" aria-live="polite">
+          <div class="empty-state">
+            <span>Selecione um endpoint</span>
+            <p>Use a navegação lateral para abrir chat, documentos, workspaces, fontes, handoff ou observabilidade.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <template id="operation-template">
+      <article class="request-card">
+        <div class="operation-heading">
+          <div>
+            <span class="method-badge"></span>
+            <h2></h2>
+            <p class="operation-description"></p>
+          </div>
+          <a class="fallback-link" href="/developers/swagger-ui/index.html">Abrir no Swagger clássico</a>
+        </div>
+
+        <div class="endpoint-line">
+          <strong class="method-code"></strong>
+          <code class="path-code"></code>
+        </div>
+
+        <form class="request-form">
+          <div class="field-grid params-grid"></div>
+          <section class="body-section" hidden>
+            <div class="section-title">
+              <span>Corpo da requisição</span>
+              <button class="ghost-button fill-example" type="button">Preencher exemplo</button>
+            </div>
+            <textarea class="body-editor" spellcheck="false"></textarea>
+            <div class="multipart-fields"></div>
+          </section>
+
+          <div class="action-row">
+            <button class="execute-button" type="submit">Executar endpoint</button>
+            <button class="ghost-button reset-button" type="button">Limpar resposta</button>
+          </div>
+        </form>
+
+        <section class="preview-section">
+          <div class="section-title">
+            <span>Exemplo cURL</span>
+            <button class="ghost-button copy-curl" type="button">Copiar</button>
+          </div>
+          <pre><code class="curl-preview"></code></pre>
+        </section>
+
+        <section class="response-section">
+          <div class="section-title">
+            <span>Resposta</span>
+            <small class="response-meta">Aguardando execução</small>
+          </div>
+          <pre><code class="response-output">Selecione "Executar endpoint" para ver status, tempo e corpo da resposta.</code></pre>
+        </section>
+      </article>
+    </template>
+
+    <script src="/developers/api-console/api-console.js"></script>
+  </body>
+</html>

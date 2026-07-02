@@ -17,8 +17,8 @@ public class TextSimilarityScorer {
             "para", "com", "uma", "como", "que", "por", "das", "dos", "nas", "nos",
             "qual", "quais", "quando", "onde", "sobre", "voce", "voces", "isso", "esta",
             "what", "which", "when", "where", "about", "should", "could", "would", "with",
-            "the", "and", "for", "this", "that", "need", "needs", "how", "does",
-            "cual", "cuales", "donde", "este", "debo");
+            "the", "and", "for", "this", "that", "need", "needs", "how", "does", "want", "happens",
+            "cual", "cuales", "donde", "este", "debo", "puede", "pueden");
 
     private static final Map<String, Set<String>> MULTILINGUAL_SYNONYMS = Map.ofEntries(
             Map.entry("information", Set.of("informacao", "informacoes", "dados", "detalhes")),
@@ -50,6 +50,16 @@ public class TextSimilarityScorer {
             Map.entry("visit", Set.of("visita", "visitar")),
             Map.entry("broker", Set.of("corretor")),
             Map.entry("analysis", Set.of("analise")),
+            Map.entry("cancel", Set.of("cancelamento", "cancelar", "cancellation", "rescisao", "termination")),
+            Map.entry("cancellation", Set.of("cancelamento", "cancelar", "rescisao", "termination")),
+            Map.entry("termination", Set.of("rescisao", "encerramento", "cancelamento")),
+            Map.entry("locacao", Set.of("rental", "rent", "aluguel")),
+            Map.entry("aluguel", Set.of("rental", "rent", "locacao")),
+            Map.entry("cancelamento", Set.of("cancel", "cancellation", "termination", "rescisao")),
+            Map.entry("cancelar", Set.of("cancel", "cancellation", "termination")),
+            Map.entry("rescisao", Set.of("termination", "cancellation", "encerramento")),
+            Map.entry("encerramento", Set.of("termination", "ending", "rescisao")),
+            Map.entry("contrato", Set.of("contract", "agreement")),
             Map.entry("informacion", Set.of("informacao", "informacoes", "dados", "detalhes")),
             Map.entry("enviar", Set.of("informar", "informe")),
             Map.entry("solicitud", Set.of("solicitacao", "pedido")),
@@ -58,7 +68,10 @@ public class TextSimilarityScorer {
             Map.entry("atendente", Set.of("atendimento", "humano")),
             Map.entry("contacto", Set.of("contato", "telefone", "email")),
             Map.entry("nombre", Set.of("nome")),
-            Map.entry("empresa", Set.of("departamento")),
+            Map.entry("empresa", Set.of("empresas", "departamento", "negocio")),
+            Map.entry("empresas", Set.of("empresa", "negocio")),
+            Map.entry("ayudar", Set.of("ayuda", "apoyar", "orientar")),
+            Map.entry("ayuda", Set.of("ayudar", "apoyar", "orientar")),
             Map.entry("resumen", Set.of("resumo")),
             Map.entry("respuesta", Set.of("retorno", "resposta")),
             Map.entry("plazo", Set.of("prazo", "retorno")),
@@ -67,7 +80,9 @@ public class TextSimilarityScorer {
             Map.entry("alquiler", Set.of("locacao", "aluguel")),
             Map.entry("inmueble", Set.of("imovel")),
             Map.entry("corredor", Set.of("corretor")),
-            Map.entry("analisis", Set.of("analise")));
+            Map.entry("analisis", Set.of("analise")),
+            Map.entry("cancelacion", Set.of("cancelamento", "cancelar", "rescisao")),
+            Map.entry("rescision", Set.of("rescisao", "encerramento", "cancelamento")));
 
     public double score(String query, String content) {
         Set<String> queryTerms = terms(query);

@@ -7,7 +7,7 @@ Este documento organiza quais materiais podem ser enviados para comprovar o esta
 Repositório atual:
 
 ```text
-https://github.com/opiagile/opiagile-ai-rag-core-public
+https://github.com/opiagile/opiagile-ai-rag-core
 ```
 
 Nome lógico do projeto:

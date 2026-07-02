@@ -1,5 +1,8 @@
 package com.opiagile.supportai.security;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -65,9 +68,9 @@ public class DemoSecurityPolicy {
         String demoToken = normalize(request.getHeader("X-Demo-Token"));
         String adminTokenHeader = normalize(request.getHeader("X-Demo-Admin-Token"));
         String bearerToken = bearerToken(request.getHeader("Authorization"));
-        return expectedToken.equals(demoToken)
-                || expectedToken.equals(adminTokenHeader)
-                || expectedToken.equals(bearerToken);
+        return constantTimeEquals(expectedToken, demoToken)
+                || constantTimeEquals(expectedToken, adminTokenHeader)
+                || constantTimeEquals(expectedToken, bearerToken);
     }
 
     private String bearerToken(String authorization) {
@@ -83,5 +86,14 @@ public class DemoSecurityPolicy {
 
     private String normalize(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private boolean constantTimeEquals(String expected, String actual) {
+        if (expected.isBlank() || actual.isBlank()) {
+            return false;
+        }
+        return MessageDigest.isEqual(
+                expected.getBytes(StandardCharsets.UTF_8),
+                actual.getBytes(StandardCharsets.UTF_8));
     }
 }

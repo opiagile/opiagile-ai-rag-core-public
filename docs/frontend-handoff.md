@@ -305,7 +305,7 @@ Use `samples/clinica/faq.txt` para uma primeira demonstração:
 Ambiente atual de validação:
 
 ```text
-http://136.248.83.176
+http://<IP_PUBLICO_DA_VPS>
 ```
 
 Testes mínimos:

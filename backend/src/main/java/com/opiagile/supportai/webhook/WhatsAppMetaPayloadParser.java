@@ -1,13 +1,13 @@
 package com.opiagile.supportai.webhook;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class WhatsAppMetaPayloadParser {
@@ -58,7 +58,7 @@ public class WhatsAppMetaPayloadParser {
                 }
             }
             return events;
-        } catch (IOException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalArgumentException("Payload Meta WhatsApp inválido.", exception);
         }
     }

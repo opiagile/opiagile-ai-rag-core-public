@@ -1,16 +1,49 @@
-Suporte Tecnico Opiagile Demonstração - FAQ de Atendimento
+Suporte Tecnico Opiagile Demonstracao - FAQ de Atendimento
+
+Objetivo do workspace:
+Este arquivo simula uma base de atendimento tecnico. Use dados ficticios. A IA deve responder sobre horario, abertura de chamado, SLA, senha, prioridade e handoff, sem inventar status real de chamado.
 
 Horario de suporte:
-O suporte atende de segunda a sexta, das 8h as 19h. Chamados criticos de clientes com contrato premium podem ser encaminhados para plantao.
+- Segunda a sexta: 8h as 19h.
+- Chamados criticos de clientes com contrato premium podem ser encaminhados para plantao.
+- Fora do horario comercial, registrar contexto e orientar que o retorno seguira o SLA aplicavel.
 
 Abertura de chamado:
-Para abrir um chamado, informe nome, email, empresa, produto afetado, descricao do problema, horario de ocorrencia e prints quando disponiveis.
+Para abrir um chamado, coletar:
+- Nome.
+- Email.
+- Empresa.
+- Produto afetado.
+- Descricao objetiva do problema.
+- Horario da ocorrencia.
+- Impacto no negocio.
+- Prints, logs ou evidencias quando disponiveis.
 
-Prazo de resposta:
-Chamados comuns recebem primeira resposta em ate 8 horas uteis. Chamados criticos recebem primeira resposta em ate 2 horas uteis.
+Prazo de resposta e SLA:
+- Chamados comuns recebem primeira resposta em ate 8 horas uteis.
+- Chamados criticos recebem primeira resposta em ate 2 horas uteis.
+- Incidente critico inclui indisponibilidade total, falha recorrente relevante ou alto impacto operacional.
+- Duvidas administrativas podem seguir o proximo dia util.
+- A prioridade depende de impacto, urgencia, numero de usuarios afetados e risco operacional.
 
 Redefinicao de senha:
-O usuario pode solicitar redefinicao de senha pelo portal. Se nao tiver acesso ao email cadastrado, o caso deve ser encaminhado para humano.
+- O usuario pode solicitar redefinicao de senha pela opcao "Esqueci minha senha" no portal.
+- Se nao tiver acesso ao email cadastrado, o caso deve ser encaminhado para humano.
+- Suspeita de fraude, acesso indevido, conta bloqueada por seguranca ou troca de email cadastrado tambem exigem atendimento humano.
 
 Handoff humano:
-Encaminhe para humano em caso de indisponibilidade total, problema financeiro, reclamacao, falha recorrente ou quando o usuario pedir atendimento humano.
+- Encaminhar para humano em caso de indisponibilidade total, problema financeiro, reclamacao, falha recorrente, suspeita de acesso indevido, necessidade de especialista ou pedido explicito por atendimento humano.
+- Antes do handoff, resumir contexto, produto afetado, impacto, dados coletados e proxima acao esperada.
+
+English quick answers:
+- Support is available Monday to Friday from 8 AM to 7 PM.
+- Standard tickets receive a first response within 8 business hours.
+- Critical incidents receive a first response within 2 business hours.
+- To reset a password, use the Forgot password option in the portal.
+- If the user cannot access the registered email or reports a security concern, route the case to a human support analyst.
+
+Respuestas rapidas en espanol:
+- El soporte atiende de lunes a viernes de 8 a 19 horas.
+- Los tickets comunes reciben primera respuesta en hasta 8 horas habiles.
+- Los incidentes criticos reciben primera respuesta en hasta 2 horas habiles.
+- Para redefinir la contrasena, usar la opcion Olvide mi contrasena en el portal.

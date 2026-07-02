@@ -2,6 +2,7 @@ package com.opiagile.supportai.tenant;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,6 +48,73 @@ public class TenantRepository {
                 .param("tenantSlug", tenantSlug)
                 .query(this::mapWorkspace)
                 .list();
+    }
+
+    public TenantContext createTemporarySandbox(
+            String tenantSlug,
+            String tenantName,
+            String workspaceSlug,
+            String workspaceName,
+            String workspaceDescription,
+            OffsetDateTime expiresAt) {
+        UUID tenantId = jdbc.sql("""
+                        INSERT INTO tenants (slug, name, sandbox, expires_at)
+                        VALUES (:slug, :name, true, :expiresAt)
+                        RETURNING id
+                        """)
+                .param("slug", tenantSlug)
+                .param("name", tenantName)
+                .param("expiresAt", expiresAt)
+                .query(UUID.class)
+                .single();
+
+        UUID workspaceId = jdbc.sql("""
+                        INSERT INTO workspaces (tenant_id, slug, name, description, sandbox, expires_at)
+                        VALUES (:tenantId, :slug, :name, :description, true, :expiresAt)
+                        RETURNING id
+                        """)
+                .param("tenantId", tenantId)
+                .param("slug", workspaceSlug)
+                .param("name", workspaceName)
+                .param("description", workspaceDescription)
+                .param("expiresAt", expiresAt)
+                .query(UUID.class)
+                .single();
+
+        return new TenantContext(tenantId, tenantSlug, workspaceId, workspaceSlug, workspaceName);
+    }
+
+    public List<TemporarySandboxTenant> findExpiredTemporarySandboxes(int limit) {
+        return jdbc.sql("""
+                        SELECT id, slug, expires_at
+                        FROM tenants
+                        WHERE sandbox = true
+                          AND expires_at IS NOT NULL
+                          AND expires_at <= now()
+                        ORDER BY expires_at ASC
+                        LIMIT :limit
+                        """)
+                .param("limit", limit)
+                .query((rs, rowNum) -> new TemporarySandboxTenant(
+                        rs.getObject("id", UUID.class),
+                        rs.getString("slug"),
+                        rs.getObject("expires_at", OffsetDateTime.class)))
+                .list();
+    }
+
+    public int deleteTemporarySandbox(UUID tenantId) {
+        jdbc.sql("DELETE FROM retrieval_logs WHERE tenant_id = :tenantId")
+                .param("tenantId", tenantId)
+                .update();
+        jdbc.sql("DELETE FROM documents WHERE tenant_id = :tenantId")
+                .param("tenantId", tenantId)
+                .update();
+        jdbc.sql("DELETE FROM conversations WHERE tenant_id = :tenantId")
+                .param("tenantId", tenantId)
+                .update();
+        return jdbc.sql("DELETE FROM tenants WHERE id = :tenantId AND sandbox = true")
+                .param("tenantId", tenantId)
+                .update();
     }
 
     private TenantContext mapContext(ResultSet rs, int rowNum) throws SQLException {

@@ -7,5 +7,6 @@ record StoredChunk(
         UUID documentId,
         String filename,
         String content,
+        String language,
         Double score) {
 }
